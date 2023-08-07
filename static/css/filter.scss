@@ -1,0 +1,104 @@
+.content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.logo {
+	height: 200rpx;
+	width: 200rpx;
+	margin-top: 200rpx;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 50rpx;
+}
+
+.text-area {
+	display: flex;
+	justify-content: center;
+}
+
+.title {
+	font-size: 36rpx;
+	color: #8f8f94;
+}
+
+.popup-show{
+	overflow: hidden;
+	position: fixed;
+}
+
+.popup-filter-item{
+	background: #fff;
+	box-shadow: 0 3rpx 20rpx rgba(183, 183, 183, 0.1);
+	border-radius: 10rpx;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 15rpx;
+	font-size: 30rpx;
+	min-height:60rpx;
+	width: 560rpx;
+}
+
+.popup-filter-title{
+	font-weight: 700;
+	width: 120rpx;
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow:ellipsis;
+}
+
+.popup-filter-content{
+	padding-left:10px;
+	width: 430rpx;
+}
+
+.popup-filter-input{
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.width100{
+	width: 100%;
+}
+
+.popup-filter-checkbox{
+	background: #fff;
+	box-shadow: 0 3rpx 20rpx rgba(183, 183, 183, 0.1);
+	border-radius: 10rpx;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 15rpx;
+	font-size: 30rpx;
+	min-height:76rpx;
+	width: 560rpx;
+}
+
+.margin20{
+	margin-top: 20rpx;
+}
+
+.prevent {
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	overflow: hidden;
+}
+
+.mg-left-20{
+	margin-left: 20rpx;
+}
+
+.card-body-item-100{
+	width:100%;
+}
+	

@@ -1,0 +1,94 @@
+{
+	"easycom": {
+		"^u-(.*)": "@/uni_modules/uview-ui/components/u-$1/u-$1.vue"
+	},
+	
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "erp订单"
+			}
+		},
+		{
+			"path": "pages/user/user",
+			"style": {
+				"navigationBarTitleText": "用户中心",
+				"backgroundColorTop": "#5677FC"
+			}
+		},
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "用户登录",
+				"backgroundColorTop": "#5677FC"
+			}
+		},
+		//内部用户
+		{
+			"path": "pages/staff/paper/getSStocks/getSStocks",
+			"style": {
+				"navigationBarTitleText": "原纸库存",
+				"backgroundColorTop": "#5677FC"
+			}
+		},
+		{
+			"path": "pages/staff/statis/getOrdReturnSum/getOrdReturnSum",
+			"style": {
+				"navigationBarTitleText": "退货统计",
+				"backgroundColorTop": "#5677FC",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/staff/statis/getOrdStock/getOrdStock",
+			"style": {
+				"navigationBarTitleText": "库存统计",
+				"backgroundColorTop": "#5677FC",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/staff/customer/delivery/daliy",
+			"style": {
+				"navigationBarTitleText": "客户每日送货",
+				"backgroundColorTop": "#5677FC",
+				"enablePullDownRefresh": true
+			}
+		}
+	],
+	"globalStyle": {
+		"backgroundTextStyle": "dark",
+		"navigationBarBackgroundColor": "#5677FC",
+		"navigationBarTitleText": "webapp",
+		"navigationBarTextStyle": "white",
+		"backgroundColor": "#fafafa",
+		"backgroundColorTop": "#fafafa",
+		"backgroundColorBottom": "#fafafa"
+	},
+	//配置tabbar导航栏
+	"tabBar": {
+		"color": "#666666",
+		"selectedColor": "#5677FC",
+		"backgroundColor": "#FFFFFF",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"text": "ERP订单",
+				"iconPath": "/static/img/tabbar/erp.png",
+				"selectedIconPath": "/static/img/tabbar/erp-selected.png"
+			},{
+				"pagePath": "pages/user/user",
+				"text": "用户中心",
+				"iconPath": "/static/img/tabbar/user.png",
+				"selectedIconPath": "/static/img/tabbar/user-selected.png"
+			},{
+				"pagePath": "pages/login/login",
+				"text": "登录",
+				"iconPath": "/static/img/tabbar/user.png",
+				"selectedIconPath": "/static/img/tabbar/user-selected.png"
+			}
+		]
+	},
+	"uniIdRouter": {}
+}
