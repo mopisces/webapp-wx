@@ -16,6 +16,7 @@
 </template>
 
 <script>
+	import { mapGetters } from "vuex"
 	export default {
 		props: {
 			//菜单数据源
@@ -29,9 +30,13 @@
 				default: false
 			},
 			//按钮默认位置离底部距离（px）
-			bottomPx: {
+			/* bottomPx: {
 				type: Number,
 				default: 30
+			}, */
+			bottomPct: {
+				type: Number,
+				default: 0.8
 			},
 			//按钮默认位置离右边距离（px）
 			rightPx: {
@@ -56,10 +61,12 @@
 				},
 				showBtn: false,
 				isLeft: false,
+				bottomPx: 30,
 			};
 		},
 		mounted() {
 			this.$nextTick(res => {
+				this.bottomPx = this.bottomPct * this.pageHeight;
 				this.getSysInfo()
 			})
 		},
@@ -114,7 +121,15 @@
 			//点击菜单
 			click(item) {
 				this.$emit('click', item)
+			},
+			closeMenu(){
+				this.showBtn = false
 			}
+		},
+		computed: {
+			...mapGetters({
+				pageHeight: "page/pageHeight" 
+			}),
 		}
 	};
 </script>

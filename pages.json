@@ -55,6 +55,14 @@
 				"backgroundColorTop": "#5677FC",
 				"enablePullDownRefresh": true
 			}
+		},
+		{
+			"path": "pages/staff/customer/delivery/dailyDetail",
+			"style": {
+				"navigationBarTitleText": "客户每日送货详情",
+				"backgroundColorTop": "#5677FC",
+				"enablePullDownRefresh": true
+			}
 		}
 	],
 	"globalStyle": {

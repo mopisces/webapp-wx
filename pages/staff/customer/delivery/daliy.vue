@@ -1,10 +1,11 @@
 <template>
-	<page-meta :page-style="'overflow:'+(config.popup.show?'hidden':'visible')"></page-meta>
+	<page-meta :page-style="'overflow:'+(config.popup.show || config.filter.show?'hidden':'visible')"></page-meta>
 	<view>
 		<liu-rotating-menu 
+			ref="dragMenu"
 			:btnObj="config.menu.options"
-			:bottomPx="pageHeight * 0.8"
-			@click="click">
+			:bottomPct="0.8"
+			@click="menuClick">
 		</liu-rotating-menu>
 		<uni-list>
 			<uni-list-item 
@@ -13,7 +14,7 @@
 				:title="item.title" 
 				:rightText="item.rightText"
 				v-for="(item, index) in listData" :key="index"
-				@click="listClick"
+				@click="itemClick(item)"
 			/>
 		</uni-list>
 		<u-popup
@@ -55,19 +56,65 @@
 				</view>
 			</uni-card>
 		</u-popup>
+		<!-- 筛选框 -->
+		<webapp-popup-filter
+			:filterShow.sync="config.filter.show"
+			:isTabbar="false"
+			@reset="reset"
+			@search="search"
+		>
+			<view>
+				<webapp-cus-picker :cusId.sync="formData.cusId"></webapp-cus-picker>
+				
+				<view class="popup-filter-item margin20" @click="config.calendar.show = true">
+					<view class="popup-filter-title">日期区间</view>
+					<view class="popup-filter-content popup-filter-input">
+						<view>
+							<u--input
+								v-model="formData.beginDate" 
+								placeholder="开始日期" 
+								:disabled="true"
+								:disableDefaultPadding="true" 
+								inputAlign="center" 
+							>
+							</u--input>
+						</view>
+						<view>~</view>
+						<view>
+							<u--input
+								v-model="formData.endDate" 
+								placeholder="结束日期" 
+								:disabled="true"
+								:disableDefaultPadding="true" 
+								inputAlign="center" 
+							>
+							</u--input>
+						</view>
+						<view>
+							<u-icon name="arrow-right" color="#2979ff" size="15"></u-icon>
+						</view>
+					</view>
+				</view>
+			</view>
+		</webapp-popup-filter>
 	</view>
 </template>
 
 <script>
 	import { fetchDeliveryDailyInfo } from '@/api/staff/customer.js';
-	import { mapGetters } from "vuex";
+	import WebappPopupFilter from '@/components/webapp-popup-filter/webapp-popup-filter.vue';
+	import WebappCusPicker from '@/components/webapp-cus-picker/webapp-cus-picker.vue';
 	export default {
+		components:{
+			WebappPopupFilter,
+			WebappCusPicker,
+		},
 		data(){
 			return {
 				config: {
 					menu: {
 						options: {
-							id: 'custDailyD',
+							id: 'cusDailyDelivery',
 							name: '菜单',
 							childs: [
 								{
@@ -83,6 +130,12 @@
 					},
 					popup: {
 						show: false,
+					},
+					filter: {
+						show: false
+					},
+					calendar: {
+						show: false
 					}
 				},
 				staffInfo: {
@@ -96,7 +149,7 @@
 				formData: {
 					cusId: null,
 					beginDate: '2023-06-01',
-					endDate: '2023-06-02',
+					endDate: '2023-06-01',
 					type: 1, 
 				}
 			}
@@ -105,14 +158,23 @@
 			this.queryInfo();
 		},
 		methods: {
-			click(e){
+			menuClick(e){
+				if( e.id == '1' ){
+					this.config.filter.show = true;
+				}
 				if( e.id == '2' ){
 					this.formData.type = 2;
 					this.queryInfo();
 				}
+				this.closeMenu();
 			},
-			listClick(e){
-				console.log('执行click事件', e.data)
+			itemClick( row ){
+				this.closeMenu();
+				const data = Object.assign({ fromType: 1 }, this.formData, {cusId: row.CusId});
+				console.log(data)
+				uni.navigateTo({
+					url: '/pages/staff/customer/delivery/dailyDetail?filterInfo=' + encodeURIComponent(JSON.stringify(data)) 
+				})
 			},
 			async queryInfo(){
 				const {result} = await fetchDeliveryDailyInfo( this.formData );
@@ -134,13 +196,18 @@
 				this.config.popup.show = false;
 			},
 			open(){
-				console.log('open')
-			}
-		},
-		computed: {
-			...mapGetters({
-				pageHeight: "page/pageHeight" 
-			}),
+				this.closeMenu();
+			},
+			closeMenu(){
+				this.$refs.dragMenu.closeMenu();
+			},
+			//筛选按钮
+			reset(){},
+			search(){
+				this.listData = [];
+				this.formData.type = 1;
+				this.queryInfo();
+			},
 		}
 	}
 </script>

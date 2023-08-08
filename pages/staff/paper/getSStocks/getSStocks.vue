@@ -1,7 +1,6 @@
 <template>
 	<view>
 		<view ref="sstocksHeader" id="sstocksHeader">
-			<!-- <u-notice-bar :text="config.notice.text"></u-notice-bar> -->
 			<u-subsection 
 				:list="config.subsection.list" 
 				mode="subsection" 

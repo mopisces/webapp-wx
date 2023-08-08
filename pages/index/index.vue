@@ -79,12 +79,7 @@
 			@search="search"
 		>
 			<view>
-				<webapp-cus-picker 
-					:defaultIndex="[1]" 
-					:defaultValue="formData.cusId" 
-					@cusConfirm="cusConfirm">
-				</webapp-cus-picker>
-				
+				<webapp-cus-picker :cusId.sync="formData.cusId"></webapp-cus-picker>
 				<view class="popup-filter-item margin20">
 					<view class="popup-filter-title">订单编号</view>
 					<view class="popup-filter-content popup-filter-input">
@@ -374,9 +369,6 @@
 			},
 			itemClick(index){
 				console.log(index)
-			},
-			cusConfirm( value ){
-				this.formData.cusId = value.CusId;
 			},
 			reset(){
 				this.formData = this.$options.data().formData;

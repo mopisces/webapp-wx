@@ -5,7 +5,7 @@
 			<view class="popup-filter-content popup-filter-input">
 				<view >
 					<u--input
-						:value="defaultValue"
+						:value="cusName"
 						placeholder="请选择客户" 
 						:disableDefaultPadding="true" 
 						inputAlign="center"
@@ -28,7 +28,6 @@
 			:immediateChange="true"
 			@close="onClose"
 			@confirm="onConfirm"
-			@change="onChange"
 			@cancel="onCancel">
 		</u-picker>
 	</view>
@@ -39,17 +38,21 @@
 	export default {
 		name: 'WebappCusPicker',
 		props: {
-			defaultValue:{
+			/* defaultValue:{
 				type: String,
 				default: ''
+			}, */
+			cusId: {
+				type: String,
+				default: null
 			}
 		},
 		data(){
 			return {
 				picker:{
-					show:false,
-					title:'请选择客户',
-					loading:false,
+					show: false,
+					title: '请选择客户',
+					loading: false,
 					columns:[[
 						{
 							CusId:'MWK*',
@@ -65,21 +68,18 @@
 						}
 					]],
 					defaultIndex: []
-				}
+				},
+				cusName: this.cusId
 			}
 		},
 		methods:{
 			onClose(){
 				this.picker.show = false;
-				//this.$emit('cusChange',this.)
 			},
 			onConfirm( arr ){
 				this.picker.title = arr.value[0].CusName;
-				this.$emit('cusConfirm',arr.value[0]);
+				this.cusName = arr.value[0].CusId;
 				this.onClose();
-			},
-			onChange( arr ){
-				
 			},
 			onCancel(){
 				this.onClose();
@@ -87,14 +87,13 @@
 			init(){
 				try{
 					let that = this;
-					//const result = await getSF();
 					this.picker.columns[0].forEach((item,idx)=>{
-						if( item.CusId == that.defaultValue ){
+						if( item.CusId == that.cusName ){
 							that.picker.defaultIndex = [ idx ]
 						}
 					});
 				}catch(e){
-					//console.log(e)
+					console.log(e)
 				}
 			}
 		},
@@ -105,11 +104,12 @@
 			
 		},
 		watch:{
-			defaultValue:{
-				handler( newValue, oldValue ){
-					console.log(newValue)
-				},
-				deep: true
+			cusId(newV,oldV){
+				this.cusName = newV;
+				this.init();
+			},
+			cusName(newV,oldV){
+				this.$emit("update:cusId", newV);
 			}
 		}
 	}
