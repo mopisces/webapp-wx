@@ -3,6 +3,7 @@
 	<view>
 		<liu-rotating-menu 
 			ref="dragMenu"
+			v-show="!config.filter.show && !config.popup.show " 
 			:btnObj="config.menu.options"
 			:bottomPct="0.8"
 			@click="menuClick">
@@ -66,53 +67,36 @@
 			<view>
 				<webapp-cus-picker :cusId.sync="formData.cusId"></webapp-cus-picker>
 				
-				<view class="popup-filter-item margin20" @click="config.calendar.show = true">
-					<view class="popup-filter-title">日期区间</view>
-					<view class="popup-filter-content popup-filter-input">
-						<view>
-							<u--input
-								v-model="formData.beginDate" 
-								placeholder="开始日期" 
-								:disabled="true"
-								:disableDefaultPadding="true" 
-								inputAlign="center" 
-							>
-							</u--input>
-						</view>
-						<view>~</view>
-						<view>
-							<u--input
-								v-model="formData.endDate" 
-								placeholder="结束日期" 
-								:disabled="true"
-								:disableDefaultPadding="true" 
-								inputAlign="center" 
-							>
-							</u--input>
-						</view>
-						<view>
-							<u-icon name="arrow-right" color="#2979ff" size="15"></u-icon>
-						</view>
-					</view>
-				</view>
+				<!-- 日期区间 -->
+				<webapp-range-date 
+					:beginDate.sync="formData.beginDate"
+					:endDate.sync="formData.endDate"
+					:maxDate.sync="formData.maxDate"
+					:minDate.sync="formData.minDate"
+					:rangeDate.sync="formData.rangeDate"
+				/>
+				
 			</view>
 		</webapp-popup-filter>
 	</view>
 </template>
 
 <script>
-	import { fetchDeliveryDailyInfo } from '@/api/staff/customer.js';
-	import WebappPopupFilter from '@/components/webapp-popup-filter/webapp-popup-filter.vue';
-	import WebappCusPicker from '@/components/webapp-cus-picker/webapp-cus-picker.vue';
+	import { fetchDeliveryDailyInfo } from '@/api/staff/customer.js'
+	import WebappPopupFilter from '@/components/webapp-popup-filter/webapp-popup-filter.vue'
+	import WebappCusPicker from '@/components/webapp-cus-picker/webapp-cus-picker.vue'
+	import WebappRangeDate from '@/components/webapp-range-date/webapp-range-date.vue'
 	export default {
 		components:{
 			WebappPopupFilter,
 			WebappCusPicker,
+			WebappRangeDate
 		},
 		data(){
 			return {
 				config: {
 					menu: {
+						show: true,
 						options: {
 							id: 'cusDailyDelivery',
 							name: '菜单',
@@ -149,8 +133,12 @@
 				formData: {
 					cusId: null,
 					beginDate: '2023-06-01',
-					endDate: '2023-06-01',
+					endDate: '2023-06-05',
 					type: 1, 
+					
+					maxDate: '2023-10-01',
+					minDate: '2023-04-01',
+					rangeDate: ['2023-06-01', '2023-06-05']
 				}
 			}
 		},
@@ -166,12 +154,11 @@
 					this.formData.type = 2;
 					this.queryInfo();
 				}
-				this.closeMenu();
+				this.menuClose();
 			},
 			itemClick( row ){
-				this.closeMenu();
+				this.menuClose();
 				const data = Object.assign({ fromType: 1 }, this.formData, {cusId: row.CusId});
-				console.log(data)
 				uni.navigateTo({
 					url: '/pages/staff/customer/delivery/dailyDetail?filterInfo=' + encodeURIComponent(JSON.stringify(data)) 
 				})
@@ -196,9 +183,9 @@
 				this.config.popup.show = false;
 			},
 			open(){
-				this.closeMenu();
+				this.menuClose();
 			},
-			closeMenu(){
+			menuClose(){
 				this.$refs.dragMenu.closeMenu();
 			},
 			//筛选按钮
@@ -207,11 +194,12 @@
 				this.listData = [];
 				this.formData.type = 1;
 				this.queryInfo();
-			},
+			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
 	@import "@/static/css/filter.scss";
+	@import "@/static/css/card.scss";
 </style>

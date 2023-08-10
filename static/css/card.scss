@@ -1,0 +1,46 @@
+.card-header-container{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	color: $u-main-color;
+}
+
+.card-body-container{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-flow: wrap;
+}
+
+.card-body-item{
+	display: flex;
+	overflow: hidden;
+	padding: 5rpx 0;
+}
+
+.card-body-txt{
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:nowrap;
+}
+
+.card-body-item-100{
+	width:100%;
+}
+
+.card-body-item-50{
+	width:50%;
+}
+
+.red-color{
+	color: $u-error;
+}
+.blue-color{
+	color: $u-primary;
+}
+.green-color{
+	color: $u-success;
+}
+.mg-left-20{
+	margin-left: 20rpx;
+}

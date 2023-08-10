@@ -48,7 +48,7 @@
 			</view>
 		</view>
 		<u-popup
-			:show="config.popup.show" 
+			:show="show" 
 			mode="center" 
 			:closeOnClickOverlay="true"
 			:safeAreaInsetBottom="false" 
@@ -83,17 +83,26 @@
 								<view>
 									<view 
 										:class=" radio == item.prevNext ? 'prv-next-radio-container bg-color' : 'prv-next-radio-container' ">
-										<view>
-											<view v-if="item.PaperCode" >
+										<view v-if=" item.tag == 'paperCode' ">
+											<view>
 												纸类:{{item.PaperCode}}
 												<view v-if="item.PaperName">{{'[' + item.PaperName + ']'}}</view>
-											</view>
-											<view v-if="item.PaperWidth" >
-												门幅:{{item.PaperWidth}}
 											</view>
 											<view>整卷卷数:{{item.ZJCount}}</view>
 											<view>残卷卷数:{{item.CJCount}}</view>
 											<view>重量:{{item.SRWt}}</view>
+										</view>
+										<view v-else-if=" item.tag == 'paperWidth' ">
+											<view>
+												门幅:{{ item.PaperWidth }}
+											</view>
+											<view>整卷卷数:{{item.ZJCount}}</view>
+											<view>残卷卷数:{{item.CJCount}}</view>
+											<view>重量:{{item.SRWt}}</view>
+										</view>
+										<view v-else-if=" item.tag == 'deliveryDaily' ">
+											<view>{{ item.DNDate }}</view>
+											<view>{{ item.ICount }}笔订单</view>
 										</view>
 										<radio
 											:value="item.prevNext" 
@@ -116,6 +125,11 @@
 		props: {
 			radioData: {
 				type: Array,
+				default: []
+			},
+			popupShow: {
+				type: Boolean,
+				default: false
 			}
 		},
 		data () {
@@ -127,9 +141,6 @@
 						scrollTop: '',
 					},
 					popup: {
-						show: false
-					},
-					radio: {
 						show: false
 					},
 					header: {
@@ -148,20 +159,14 @@
 						}
 					}
 				},
-				isActive: 0
+				isActive: 0,
 			}
 		},
 		created(){
-			if( this.radioData.length == 0 ){
-				this.radio = null;
-			}else{
-				if( this.radioData[0].prevNext ){
-					this.radio = this.radioData[0].prevNext;
-				}
-			}
+			
 		},
 		mounted(){
-			this.controllerPrevNext();
+			
 		},
 		methods: {
 			headerChange( type ){
@@ -183,7 +188,7 @@
 			},
 			middleClick(){
 				this.radio = this.radioData[ this.config.header.index ].prevNext;
-				this.config.popup.show = true;
+				this.$emit("update:popupShow", true);
 			},
 			controllerPrevNext(){
 				let prev = Number(this.config.header.index) - 1;
@@ -211,11 +216,10 @@
 				}
 			},
 			close(){
-				this.config.popup.show = false;
+				this.$emit("update:popupShow", false);
 				this.config.scroll.scrollTop = 0;
 			},
 			async open(){
-				
 				this.$nextTick(() => {
 					if( this.config.scroll.anchor == null ){
 						uni.createSelectorQuery()
@@ -230,7 +234,6 @@
 					.select("#" + this.radioData[this.config.header.index].id)
 					.boundingClientRect(data=>{
 						this.config.scroll.scrollTop = data.top - this.config.scroll.anchor
-						console.log(this.config.scroll.scrollTop)
 					}).exec();
 				})
 			},
@@ -250,13 +253,28 @@
 		computed:{
 			radioChange(){
 				return this.radio;
+			},
+			show:{
+				get(){
+					return this.$props.popupShow;
+				},
+				set( value ){
+					this.$emit("update:popupShow", value);
+				}
 			}
 		},
 		watch:{
 			radioChange( newV, oldV ){
 				this.$emit('radioConfirm',newV);
 			},
-			
+			radioData: {
+				handler( newV, oldV ){
+					this.radioData = newV;
+					this.radio = this.radioData[0].prevNext;
+					this.controllerPrevNext();
+				},
+				deep: true
+			}
 		}
 	}
 </script>
@@ -341,6 +359,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		min-height: 100rpx;
 	}
 	
 	.bg-color{

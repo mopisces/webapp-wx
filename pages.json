@@ -49,6 +49,13 @@
 			}
 		},
 		{
+			"path": "pages/staff/statis/statisOrderList/statisOrderList",
+			"style": {
+				"navigationBarTitleText": "订单列表",
+				"backgroundColorTop": "#5677FC"
+			}
+		},
+		{
 			"path": "pages/staff/customer/delivery/daliy",
 			"style": {
 				"navigationBarTitleText": "客户每日送货",
@@ -60,8 +67,14 @@
 			"path": "pages/staff/customer/delivery/dailyDetail",
 			"style": {
 				"navigationBarTitleText": "客户每日送货详情",
-				"backgroundColorTop": "#5677FC",
-				"enablePullDownRefresh": true
+				"backgroundColorTop": "#5677FC"
+			}
+		},
+		{
+			"path": "pages/staff/customer/frec/cusContact/cusContact",
+			"style": {
+				"navigationBarTitleText": "客户往来统计",
+				"backgroundColorTop": "#5677FC"
 			}
 		}
 	],

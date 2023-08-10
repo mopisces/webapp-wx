@@ -9,7 +9,7 @@
 			></u-subsection>
 		</view>
 		<webapp-prv-next 
-			v-if="config.prevNext.show" 
+			:popupShow.sync="config.prevNext.popupShow"
 			:radioData="config.prevNext.radioData" 
 			:key="Math.random()"
 			@radioConfirm="radioConfirm"
@@ -27,6 +27,7 @@
 			></zb-table>
 		</view>
 		<liu-drag-button 
+			v-show=" !config.prevNext.popupShow "
 			:bottomPx="height*0.8"
 			@clickBtn="sumBtnClick"
 		>
@@ -37,9 +38,9 @@
 </template>
 
 <script>
-	import { getSStockConfig, getSStock } from '@/api/staff/paper.js';
-	import WebappPrvNext from '@/components/webapp-prv-next/webapp-prv-next.vue';
-	import { mapGetters } from 'vuex';
+	import { getSStockConfig, getSStock } from '@/api/staff/paper.js'
+	import WebappPrvNext from '@/components/webapp-prv-next/webapp-prv-next.vue'
+	import { mapGetters } from 'vuex'
 	
 	export default {
 		components:{
@@ -49,7 +50,7 @@
 			return {
 				config:{
 					subsection:{
-						list:['按门幅汇总','按纸类汇总'],
+						list:['按纸类汇总', '按门幅汇总'],
 					},
 					prevNext: {
 						columns: {
@@ -69,7 +70,7 @@
 							]
 						},
 						radioData: [],
-						show: false
+						popupShow: false,
 					},
 					notice: {
 						text: '',
@@ -99,20 +100,13 @@
 		},
 		mounted(){
 			this.getConfig();
-			
+			this.setTableHeight();
 		},
 		methods:{
-			clickBtn(){
-				
-			},
 			sectionChange(idx){
 				this.filterForm.dataType = idx;
-				this.config.prevNext.show = false;
 				this.setPageType( idx )
 				this.config.table.data = [];
-				this.$nextTick(() => {
-					this.config.prevNext.show = true;
-				});
 				this.getData();
 			}, 
 			async getConfig(){
@@ -122,7 +116,6 @@
 				this.radioData.codeData = result.code_select;
 				this.setPageType( this.filterForm.dataType )
 				this.$nextTick(() => {
-					this.config.prevNext.show = true;
 					if( this.filterForm.searchData ){
 						this.getData();
 					}
@@ -152,27 +145,21 @@
 					type: 'default',
 					duration: 3000,
 				})
+			},
+			setTableHeight(){
+				uni.createSelectorQuery().in(this).select("#sstocksHeader").boundingClientRect( data =>{
+					this.config.table.height = this.height - data.height - (136 * this.width / 750) - 25;
+				}).exec();
 			}
 		},
 		computed: {
 			...mapGetters({
 				height: 'page/pageHeight',
 				width: 'page/pageWidth'
-			}),
-			prevNextShow(){
-				return this.config.prevNext.show
-			}
+			})
 		},
 		watch: {
-			prevNextShow( newV, oldV ){
-				if( newV ){
-					if( this.config.table.height == null ){
-						uni.createSelectorQuery().in(this).select("#sstocksHeader").boundingClientRect( data =>{
-							this.config.table.height = this.height - data.height - (136 * this.width / 750) - 25;
-						}).exec();
-					}
-				}
-			}
+			
 		}
 	}
 </script>

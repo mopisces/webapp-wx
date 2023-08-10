@@ -55,11 +55,11 @@
 		props: {
 			filterShow:{
 				type: Boolean,
-				default:false
+				default: false
 			},
 			isTabbar:{
 				type: Boolean,
-				default:false
+				default: false
 			}
 		},
 		data() {

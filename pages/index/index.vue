@@ -109,96 +109,25 @@
 						</view>
 					</view>
 				</view>
-				
-				<view class="popup-filter-item margin20">
-					<view class="popup-filter-title">纸箱尺寸</view>
-					<view class="popup-filter-content popup-filter-input">
-						<view>
-							<u--input
-								v-model="formData.boxL" 
-								placeholder="长" 
-								:disableDefaultPadding="true" 
-								inputAlign="center" 
-								>
-							</u--input>
-						</view>
-						<view>×</view>
-						<view>
-							<u--input
-								v-model="formData.boxW" 
-								placeholder="宽" 
-								:disableDefaultPadding="true" 
-								inputAlign="center" 
-								>
-							</u--input>
-						</view>
-						<view>×</view>
-						<view>
-							<u--input 
-								v-model="formData.boxH" 
-								placeholder="高" 
-								:disableDefaultPadding="true" 
-								inputAlign="center" 
-								>
-							</u--input>
-						</view>
-					</view>
-				</view>
-				
-				<view class="popup-filter-item margin20">
-					<view class="popup-filter-title">纸板尺寸</view>
-					<view class="popup-filter-content popup-filter-input">
-						<view>
-							<u--input
-								v-model="formData.bdL" 
-								placeholder="长" 
-								:disableDefaultPadding="true" 
-								inputAlign="center" 
-								>
-							</u--input>
-						</view>
-						<view>×</view>
-						<view>
-							<u--input
-								v-model="formData.bdW" 
-								placeholder="宽" 
-								:disableDefaultPadding="true" 
-								inputAlign="center" 
-								>
-							</u--input>
-						</view>
-					</view>
-				</view>
-				
-				<view class="popup-filter-item margin20" @click="config.calendar.show = true">
-					<view class="popup-filter-title">日期区间</view>
-					<view class="popup-filter-content popup-filter-input">
-						<view>
-							<u--input
-								v-model="formData.beginDate" 
-								placeholder="开始日期" 
-								:disabled="true"
-								:disableDefaultPadding="true" 
-								inputAlign="center" 
-							>
-							</u--input>
-						</view>
-						<view>~</view>
-						<view>
-							<u--input
-								v-model="formData.endDate" 
-								placeholder="结束日期" 
-								:disabled="true"
-								:disableDefaultPadding="true" 
-								inputAlign="center" 
-							>
-							</u--input>
-						</view>
-						<view>
-							<u-icon name="arrow-right" color="#2979ff" size="15"></u-icon>
-						</view>
-					</view>
-				</view>
+				<!-- 纸箱尺寸 -->
+				<webapp-filter-box-size
+					:boxL.sync="formData.boxL"
+					:boxW.sync="formData.boxW"
+					:boxH.sync="formData.boxH"
+				/>
+				<!-- 纸板尺寸 -->
+				<webapp-filter-bd-size
+					:bdL.sync="formData.bdL"
+					:bdW.sync="formData.bdW"
+				/>
+				<!-- 日期区间 -->
+				<webapp-range-date 
+					:beginDate.sync="formData.beginDate"
+					:endDate.sync="formData.endDate"
+					:maxDate.sync="formData.maxDate"
+					:minDate.sync="formData.minDate"
+					:rangeDate.sync="formData.rangeDate"
+				/>
 				
 				<view class="popup-filter-checkbox margin20">
 					<view class="popup-filter-title">日期类型</view>
@@ -208,45 +137,28 @@
 							v-model="formData.dateType" 
 							:localdata="config.checkBox.options">
 						</uni-data-checkbox>
-						<!-- <liu-checkBox 
-							checkType="single" 
-							:checkOptions="config.checkBox.options" 
-							activeColor="#FF0000" 
-							@checkChange="dateTypeChange"
-						>
-						</liu-checkBox> -->
 					</view>
 				</view>
 			</view>
-			
 		</webapp-popup-filter>
-		<u-calendar 
-			:show="config.calendar.show" 
-			:showTitle="false"
-			mode="range" 
-			:closeOnClickOverlay="false" 
-			:allowSameDay="true"
-			:defaultDate="formData.rangeDate"
-			:minDate="formData.minDate"
-			:maxDate="formData.maxDate"
-			@confirm="dateConfirm"
-			@close="config.calendar.show = false"
-			v-if="config.calendar.show"
-		>
-		</u-calendar>
+		
 	</view>
 </template>
 
 <script>
-	import WebappPopupFilter from '@/components/webapp-popup-filter/webapp-popup-filter.vue';
-	/* import LiuCheckBox from '@/uni_modules/liu-checkBox/components/liu-checkBox/liu-checkBox.vue'; */
-	import WebappCusPicker from '@/components/webapp-cus-picker/webapp-cus-picker.vue';
+	import WebappPopupFilter from '@/components/webapp-popup-filter/webapp-popup-filter.vue'
+	import WebappCusPicker from '@/components/webapp-cus-picker/webapp-cus-picker.vue'
+	import WebappRangeDate from '@/components/webapp-range-date/webapp-range-date.vue'
+	import WebappFilterBdSize from '@/components/webapp-filter-bd-size/webapp-filter-bd-size.vue'
+	import WebappFilterBoxSize from '@/components/webapp-filter-box-size/webapp-filter-box-size.vue'
 	import { getErpOrders, getErpConfig } from '@/api/staff/erpOrders.js'
 	export default {
 		components:{
 			WebappPopupFilter,
-			/* LiuCheckBox, */
 			WebappCusPicker,
+			WebappRangeDate,
+			WebappFilterBdSize,
+			WebappFilterBoxSize
 		},
 		data() {
 			return {
@@ -302,7 +214,7 @@
 					erpState: 0,
 					//客户
 					cusId: null,
-					//客订单号
+					//订单编号
 					cusOrderId: null,
 					//订单数量
 					ordQty:null,
@@ -315,7 +227,9 @@
 					bdW: null,
 					//日期
 					rangeDate: [ ],
+					//开始日期
 					beginDate: null,
+					//结束日期
 					endDate: null,
 					//日期类型
 					dateType: 1, 
@@ -350,32 +264,34 @@
 					this.formData.rangeDate = [ this.formData.beginDate, this.formData.endDate ]
 					this.formData.pageInit = false;
 				}
-				const { result } = await getErpOrders(this.formData);
+				this.formData.pageNo = pageNo
+				this.formData.pageSize = pageSize
+				const { result } = await getErpOrders(this.formData)
 				this.$refs.paging.complete(result)
 			},
 			tabsChange( evt ){
-				this.formData.erpState = evt.index;
+				this.formData.erpState = evt.index
 			},
 			close(){
-				this.config.filter.show = false;
+				this.config.filter.show = false
 			},
 			dateTypeChange( item ){
-				this.formData.dateType = item[0].id;
+				this.formData.dateType = item[0].id
 			},
 			dateConfirm( dateList ) {
-				this.config.calendar.show = false;
-				this.formData.beginDate = dateList[0];
-				this.formData.endDate = dateList[ dateList.length - 1 ];
+				this.config.calendar.show = false
+				this.formData.beginDate = dateList[0]
+				this.formData.endDate = dateList[ dateList.length - 1 ]
 			},
 			itemClick(index){
 				console.log(index)
 			},
 			reset(){
-				this.formData = this.$options.data().formData;
-				this.$refs.paging.reload();
+				this.formData = this.$options.data().formData
+				this.$refs.paging.reload()
 			},
 			search(){
-				this.$refs.paging.reload();
+				this.$refs.paging.reload()
 			}
 		},
 		computed: {
@@ -393,63 +309,5 @@
 
 <style lang="scss" scoped>
 	@import "@/static/css/filter.scss";
-</style>
-<!-- list-item -->
-<style lang="scss" scoped>
-	.card-header-container{
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		color: $u-main-color;
-	}
-	
-	.card-body-container{
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		flex-flow: wrap;
-	}
-	
-	.card-body-item{
-		display: flex;
-		overflow: hidden;
-		/* align-items: center;
-		justify-content: space-between; */
-		padding: 5rpx 0;
-	}
-	
-	.card-body-txt{
-		overflow:hidden;
-		text-overflow:ellipsis;
-		white-space:nowrap;
-	}
-	
-	.card-body-item-100{
-		width:100%;
-	}
-	
-	.card-body-item-50{
-		width:50%;
-	}
-	
-	.red-color{
-		color: $u-error;
-	}
-	.blue-color{
-		color: $u-primary;
-	}
-	.green-color{
-		color: $u-success;
-	}
-	
-	.card-footer-container{
-		display: flex;
-		justify-content: flex-end;
-	}
-	
-	.confirmBtn{
-		height:40rpx;
-		font-size: 28rpx;
-		padding: 0 15rpx;
-	}
+	@import "@/static/css/card.scss";
 </style>

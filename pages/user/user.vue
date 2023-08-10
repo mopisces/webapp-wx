@@ -101,8 +101,6 @@
 				</view>
 			</view>
 			
-			
-			
 			<!-- 我的工具 -->
 			<view class="karry-box karry-tool-box" v-if="authMap.toolManage">
 				<view class="karry-box-header">
@@ -152,9 +150,7 @@
 			}),
 		},
 		async mounted(){
-			this.$store.dispatch('user/getUserInfo').then(()=>{
-				console.log(this.authMap)
-			})
+			this.$store.dispatch('user/getUserInfo')
 		},
 		methods:{
 			openPage( url ){
