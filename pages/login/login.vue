@@ -64,8 +64,10 @@
 			></u-button>
 		</view>
 		<u-picker 
-			:show="config.picker.show" 
 			ref="uPicker" 
+			:show="config.picker.show" 
+			:showToolbar="true"
+			title="请选择厂商"
 			:loading="config.picker.loading"
 			:columns="config.picker.columns" 
 			keyName="FFullName"

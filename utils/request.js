@@ -74,14 +74,26 @@ module.exports = (vm) => {
 	const handleCode = (code, msg) => {
 		console.log(code,invalidCode,noPermissionCode)
 		switch (code) {
-			case invalidCode:
+			case 400:
 				uni.showToast({
 					title: msg || `后端接口${code}异常`, 
 					icon: 'error', 
 					mask: true,
 					duration: messageDuration,
 				})
-				console.log('invalidCode')
+				break
+			case invalidCode:
+				 uni.showToast({
+					title: msg || `后端接口${code}异常`, 
+					icon: 'error', 
+					mask: true,
+					duration: messageDuration,
+					complete: ()=>{
+						uni.switchTab({
+							url: '/pages/login/login',
+						})
+					}
+				})
 				break
 			case noPermissionCode:
 				console.log('noPermissionCode')

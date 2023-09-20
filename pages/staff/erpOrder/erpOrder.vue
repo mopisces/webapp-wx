@@ -1,5 +1,8 @@
+<!-- ERP订单 -->
 <template>
+	<page-meta :page-style="'overflow:'+(config.filter.show?'hidden':'visible')"></page-meta>
 	<view class="content">
+		<!-- 订单列表 -->
 		<z-paging 
 			ref="paging" 
 			v-model="indexList" 
@@ -26,60 +29,57 @@
 					</view>
 				</u-tabs>
 			</view>
-			<u-card
-				:head-border-bottom="false"
-				:foot-border-top="false"
-				:padding="15"
-				margin="10rpx"
-				:foot-style="{paddingTop:'0'}"
+			<!-- 数据卡片 -->
+			<uni-card
 				v-for="(item, index) in indexList" :key="index"
+				:title=" item.strOrderId " 
+				:extra=" item.cusPoNo "
+				:is-shadow="true"
+				:border="false"
 				@click="itemClick(item)"
 			>
-				<view slot="head" class="card-header-container">
-					<view class="card-body-item card-body-item-50">
-						<text>订单号:{{ item.strOrderId }}</text>
-					</view>
-					<view class="card-body-item card-body-item-50">
-						<text>客订单号:{{ item.CusPoNo }}</text>
-					</view>
-				</view>
-				<view slot="body" class="card-body-container">
+				<view class="card-body-container">
 					<view v-if="item.MatName" class="card-body-item card-body-item-50">
-						<view class="card-body-txt">货品名称:{{ item.MatName }}</view>
-					</view>
-					<view class="card-body-item card-body-item-50">
-						<view class="card-body-txt">材质:{{ item.BoardId }}</view>
+						<text>货品名称:
+							<text class="mg-left-20">{{ item.matName }}</text>
+						</text>
 					</view>
 					<view class="card-body-item card-body-item-100">
-						<view class="card-body-txt">
-							客户:{{ item.CusId}}({{ item.CusShortName }})
-						</view>
+						<text>客户信息:
+							<text class="mg-left-20">{{ item.cusId }}({{ item.cusShortName }})</text>
+						</text>
 					</view>
-					<view class="card-body-item card-body-item-50">
-						<view class="card-body-txt">规格:{{ item.GuiGe }}</view>
+					<view class="card-body-item card-body-item-100">
+						<text>规格信息:
+							<text class="mg-left-20">{{ item.boardId }}</text>
+							<text class="mg-left-20">{{ item.guiGe }}</text>
+						</text>
 					</view>
-					<view class="card-body-item card-body-item-50">
-						<view class="card-body-txt">压线:{{ item.ScoreInfo }}</view>
+					<view class="card-body-item card-body-item-100">
+						<text>压线信息:
+							<text class="mg-left-20">{{ item.scoreInfo }}</text>
+						</text>
 					</view>
 					<view class="card-body-item card-body-item-100">
 						<view class="card-body-txt blue-color">订单</view>/
 						<view class="card-body-txt green-color">送货</view>/
 						<view class="card-body-txt red-color">退货</view>:
-						<view class="card-body-txt blue-color">{{ item.OrdQty }}</view>/
-						<view class="card-body-txt green-color">{{ item.DeliQty }}</view>/
-						<view class="card-body-txt red-color">{{ item.ReturnQty }}</view>
+						<view class="card-body-txt blue-color mg-left-20">{{ item.ordQty }}</view>/
+						<view class="card-body-txt green-color">{{ item.deliQty }}</view>/
+						<view class="card-body-txt red-color">{{ item.returnQty }}</view>
 					</view>
 				</view>
-			</u-card>
+			</uni-card>
 		</z-paging>
+		<!-- 筛选弹窗 -->
 		<webapp-popup-filter 
 			:filterShow.sync="config.filter.show"
 			:isTabbar="true"
-			@reset="reset"
-			@search="search"
+			@reset="filterReset"
+			@search="filterSearch"
 		>
 			<view>
-				<webapp-cus-picker :cusId.sync="formData.cusId"></webapp-cus-picker>
+				<webapp-cus-picker ref="cusId" :cusId.sync="formData.cusId"></webapp-cus-picker>
 				<view class="popup-filter-item margin20">
 					<view class="popup-filter-title">订单编号</view>
 					<view class="popup-filter-content popup-filter-input">
@@ -94,7 +94,7 @@
 						</view>
 					</view>
 				</view>
-				
+					
 				<view class="popup-filter-item margin20">
 					<view class="popup-filter-title">订单数量</view>
 					<view class="popup-filter-content popup-filter-input">
@@ -128,7 +128,7 @@
 					:minDate.sync="formData.minDate"
 					:rangeDate.sync="formData.rangeDate"
 				/>
-				
+					
 				<view class="popup-filter-checkbox margin20">
 					<view class="popup-filter-title">日期类型</view>
 					<view class="popup-filter-content popup-filter-input">
@@ -139,6 +139,7 @@
 						</uni-data-checkbox>
 					</view>
 				</view>
+				
 			</view>
 		</webapp-popup-filter>
 		
@@ -146,12 +147,19 @@
 </template>
 
 <script>
-	import WebappPopupFilter from '@/components/webapp-popup-filter/webapp-popup-filter.vue'
-	import WebappCusPicker from '@/components/webapp-cus-picker/webapp-cus-picker.vue'
-	import WebappRangeDate from '@/components/webapp-range-date/webapp-range-date.vue'
-	import WebappFilterBdSize from '@/components/webapp-filter-bd-size/webapp-filter-bd-size.vue'
-	import WebappFilterBoxSize from '@/components/webapp-filter-box-size/webapp-filter-box-size.vue'
-	import { getErpOrders, getErpConfig } from '@/api/staff/erpOrders.js'
+	/* 自定义筛选组件 */
+	import WebappPopupFilter from "@/components/webapp-popup-filter/webapp-popup-filter.vue"
+	/* 自定义客户选择组件 */
+	import WebappCusPicker from "@/components/webapp-cus-picker/webapp-cus-picker.vue"
+	/* 自定义日期区间组件 */
+	import WebappRangeDate from "@/components/webapp-range-date/webapp-range-date.vue"
+	/* 自定义纸板尺寸组件 */
+	import WebappFilterBdSize from "@/components/webapp-filter-bd-size/webapp-filter-bd-size.vue"
+	/* 自定义纸箱尺寸组件 */
+	import WebappFilterBoxSize from "@/components/webapp-filter-box-size/webapp-filter-box-size.vue"
+	/* api接口 */
+	import { getErpOrders, getErpConfig } from "@/api/staff/erpOrders.js"
+	
 	export default {
 		components:{
 			WebappPopupFilter,
@@ -162,7 +170,9 @@
 		},
 		data() {
 			return {
+				//页面组件配置
 				config:{
+					//头部标签配置
 					tabs:{
 						list:[
 							{
@@ -188,6 +198,11 @@
 							}
 						]
 					},
+					//筛选配置
+					filter: {
+						show: false
+					},
+					//筛选日期类型配置
 					checkBox: {
 						options: [
 							{
@@ -200,17 +215,11 @@
 							}
 							
 						]
-					},
-					calendar: {
-						show: false
-					},
-					filter: {
-						show: false
 					}
 				},
-				show:false,
-				indexList: [],
+				//筛选条件
 				formData:{
+					//订单类型
 					erpState: 0,
 					//客户
 					cusId: null,
@@ -218,30 +227,37 @@
 					cusOrderId: null,
 					//订单数量
 					ordQty:null,
-					//纸箱尺寸
+					//纸箱长
 					boxL: null,
+					//纸箱宽
 					boxW: null,
+					//纸箱高
 					boxH: null,
-					//纸板尺寸
+					//纸板长
 					bdL: null,
+					//纸板高
 					bdW: null,
-					//日期
-					rangeDate: [ ],
+					//日期区间
+					rangeDate: [],
 					//开始日期
 					beginDate: null,
 					//结束日期
 					endDate: null,
+					//可选日期范围最大
+					maxDate: null,
+					//可选日期范围最小
+					minDate: null,
 					//日期类型
 					dateType: 1, 
 					//分页信息
 					pageNo: 1,
+					//当前页数量
 					pageSize: 10,
-					//可选日期范围
-					maxDate: null,
-					minDate: null,
 					//页面是否需要重新请求参数
 					pageInit: true,
-				}
+				},
+				//数据列表
+				indexList: []
 			}
 		},
 		onLoad() {
@@ -254,6 +270,7 @@
 			
 		},
 		methods: {
+			/* 获取订单列表 */
 			async queryList( pageNo, pageSize ){
 				if( this.formData.pageInit ){
 					const { result } = await getErpConfig();
@@ -269,39 +286,24 @@
 				const { result } = await getErpOrders(this.formData)
 				this.$refs.paging.complete(result)
 			},
+			/* 头部切换选中标签 */
 			tabsChange( evt ){
 				this.formData.erpState = evt.index
+				this.$refs.paging.reload()
 			},
-			close(){
-				this.config.filter.show = false
-			},
-			dateTypeChange( item ){
-				this.formData.dateType = item[0].id
-			},
-			dateConfirm( dateList ) {
-				this.config.calendar.show = false
-				this.formData.beginDate = dateList[0]
-				this.formData.endDate = dateList[ dateList.length - 1 ]
-			},
+			/* 列表点击 */
 			itemClick(index){
-				console.log(index)
+				//this.config.filter.show = true
 			},
-			reset(){
+			/* 筛选重置 */
+			filterReset(){
 				this.formData = this.$options.data().formData
+				this.$refs.cusId.onClear()
 				this.$refs.paging.reload()
 			},
-			search(){
+			/* 筛选搜索 */
+			filterSearch(){
 				this.$refs.paging.reload()
-			}
-		},
-		computed: {
-			erpStatusChange(){
-				return this.formData.erpState;
-			}
-		},
-		watch: {
-			erpStatusChange( newV, oldV ){
-				this.$refs.paging.reload();
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-<!-- 库存统计模块 -->
+<!-- 传单统计模块 -->
 <template>
 	<view>
 		<!-- 筛选按钮 -->
@@ -10,8 +10,8 @@
 			<text>筛选</text>
 		</liu-drag-button>
 		<!-- 列表数据 -->
-		<z-paging
-			ref="ordStock" 
+		<z-paging 
+			ref="schSum" 
 			v-model="config.mock.mockList"
 			:auto-show-system-loading="true"
 			:auto="false"
@@ -19,30 +19,42 @@
 		>
 			<uni-card
 				:title="item.title" 
-				:extra="'总数:' + item.sumCount"
 				:is-shadow="true"
-				v-for="(item, index) in config.mock.mockList" :key="index"
+				v-for="(item, index) in config.mock.mockList" 
+				:key="index"
 				@click="detailClick(item)"
 			>
 				<view class="card-body-container">
 					<view class="card-body-item card-body-item-100">
-						<text>库存数量:
+						<text>订单面积:
+							<text class="mg-left-20">{{ item.sumOrdArea }}</text>
+						</text>
+					</view>
+					<view class="card-body-item card-body-item-100">
+						<text>合计长度:
+							<text class="mg-left-20">{{ item.sumLength }}</text>
+						</text>
+					</view>
+					<view class="card-body-item card-body-item-100">
+						<text>平均修边:
+							<text class="mg-left-20">{{ item.avgTrim }}</text>
+						</text>
+					</view>
+					<view class="card-body-item card-body-item-100">
+						<text>平均门幅:
+							<text class="mg-left-20">{{ item.avgPW }}</text>
+						</text>
+					</view>
+					<!-- <view class="card-body-item card-body-item-100">
+						<text>合计款数:
 							<text class="mg-left-20">{{ item.stockQty }}</text>
 						</text>
-					</view>
-					<view class="card-body-item card-body-item-100">
-						<text>库存面积:
-							<text class="mg-left-20">{{ item.stockArea }}</text>
-						</text>
-					</view>
-					<view class="card-body-item card-body-item-100">
-						<text>库存金额:
-							<text class="mg-left-20">{{ item.stockAmt }}</text>
-						</text>
-					</view>
+					</view> -->
 				</view>
 			</uni-card>
 		</z-paging>
+		
+		
 		<!-- 筛选内容 -->
 		<webapp-popup-filter
 			:filterShow.sync="config.filter.show"
@@ -50,6 +62,17 @@
 			@reset="reset"
 			@search="search"
 		>
+			<!-- 完工状态 -->
+			<view class="popup-filter-item margin20">
+				<view class="popup-filter-title">完工状态</view>
+				<view class="popup-filter-content popup-filter-input">
+					<uni-data-checkbox
+						mode="tag"
+						v-model="formData.finState" 
+						:localdata="config.filter.checkBox.finState">
+					</uni-data-checkbox>
+				</view>
+			</view>
 			<!-- 日期类型 -->
 			<view class="popup-filter-item margin20">
 				<view class="popup-filter-title">日期类型</view>
@@ -69,30 +92,7 @@
 				:minDate.sync="formData.minDate"
 				:rangeDate.sync="formData.rangeDate"
 			/>
-			<view class="popup-filter-checkbox margin20">
-				<view class="popup-filter-title">在库超期</view>
-				<view class="popup-filter-content popup-filter-input">
-					<u--input
-						v-model="formData.remainDay" 
-						placeholder="超期天数" 
-						:disableDefaultPadding="true" 
-						inputAlign="center" 
-						>
-					</u--input>
-				</view>
-			</view>
-			<view class="popup-filter-checkbox margin20">
-				<view class="popup-filter-title">交货超期</view>
-				<view class="popup-filter-content popup-filter-input">
-					<u--input
-						v-model="formData.diffDay" 
-						placeholder="超期天数" 
-						:disableDefaultPadding="true" 
-						inputAlign="center" 
-						>
-					</u--input>
-				</view>
-			</view>
+			
 			<!-- 统计类型 -->
 			<view class="popup-filter-item margin20">
 				<view class="popup-filter-title">统计类型</view>
@@ -118,45 +118,66 @@
 	/* api接口 */
 	import { getWebConfig } from "@/api/staff/common.js"
 	
-	import { fetchStockList } from "@/api/staff/statis.js"
+	import { fetchSchSumList } from "@/api/staff/statis.js"
 	
 	export default {
 		components:{
 			WebappPopupFilter,
 			WebappRangeDate
 		},
-		data(){
+		data() {
 			return {
-				/* 配置 */
+				/* 页面配置 */
 				config: {
 					/* 筛选配置 */
 					filter: {
 						show: false,
 						/* 单选配置 */
 						checkBox: {
-							dateType:  [
-								{
-									text: '订单日期',
-									value: 1,
-								},
-								{
-									text: '交货日期',
-									value: 2,
-								}
-							],
+							/* 统计维度 */
 							state: [
 								{
 									text: '汇总',
 									value: 0,
 								},
 								{
-									text: '客户',
+									text: '生产线',
 									value: 1,
 								},
+								{
+									text: '门幅',
+									value: 2,
+								},
+								{
+									text: '坑型',
+									value: 3,
+								}
+							],
+							/* 日期类型配置 */
+							dateType: [
+								{
+									text: '生产日期',
+									value: 5,
+								}
+							],
+							/* 完工状态 */
+							finState: [
+								{
+									text: '全部',
+									value: 0,
+								},
+								{
+									text: '已传',
+									value: 1,
+								},
+								{
+									text: '已提取',
+									value: 2,
+								}
 							]
-						},
+						}
 					},
-					/* 模拟 */
+					/* 模拟上拉加载数据 */
 					mock: {
 						/* 原始数据 */
 						indexList: [],
@@ -164,22 +185,18 @@
 						mockList: []
 					}
 				},
-				/* 列表数据 */
-				indexList: [],
 				/* 筛选条件 */
 				formData: {
-					//日期类型 1->订单日期 2->交货日期
-					dateType: 1,
+					//完工状态 0->全部 1->已传 2->已提取
+					finState: 0,
+					//日期类型 5->生产日期
+					dateType: 5,
 					//开始日期
 					beginDate: null,
 					//结束日期
 					endDate: null,
-					//统计维度0->汇总 1->客户
+					//统计维度0->汇总 1->生产线 2->门幅 3->坑型
 					stateType: 0,
-					//在库超期天数
-					remainDay: 0,
-					//交货超期天数
-					diffDay: 0,
 					//最大日期
 					maxDate: null,
 					//最小日期
@@ -189,24 +206,24 @@
 				}
 			}
 		},
-		mounted() {
+		mounted(){
 			this.getParams()
 		},
 		methods: {
 			/* 获取参数 */
 			async getParams(){
-				const { result } = await getWebConfig( { paramType: 'ordStockStatis' } )
+				const { result } = await getWebConfig( { paramType: 'schSumStatis' } )
 				this.formData.beginDate = result.beginDate
 				this.formData.endDate = result.endDate
 				this.formData.minDate = result.minDate
 				this.formData.maxDate = result.maxDate
 				this.formData.rangeDate = JSON.parse(JSON.stringify([this.formData.beginDate, this.formData.endDate]))
-				this.$refs.ordStock.reload()
+				this.$refs.schSum.reload()
 			},
 			/* 获取列表数据 */
 			async queryList(){
 				this.config.mock.indexList = this.$options.data().config.mock.indexList
-				const { result } = await fetchStockList( this.formData )
+				const { result } = await fetchSchSumList( this.formData )
 				this.config.mock.indexList = result
 			},
 			/* 模拟上拉加载下拉刷新数据 */
@@ -219,29 +236,8 @@
 					subList = this.config.mock.indexList.splice(0, pageSize )
 				}
 				setTimeout(()=>{
-					this.$refs.ordStock.complete(subList)
+					this.$refs.schSum.complete(subList)
 				}, 1500)
-			},
-			/* 列表点击 */
-			detailClick( row ){
-				const data = {
-					//存储过程GetOrders的类型 1->GetOrderSum 2->GetOrdReturnSum 3->GetOrdStock
-					getOrdersType: 3, 
-					//筛选条件 1->门幅 2->客户 3->业务员 4->退货原因
-					filterName: null,
-					//筛选内容
-					filterVal: null,
-					//1->显示退货数 2->显示库存数
-					showQtyType: 2
-				}
-				if( this.formData.stateType == 1 ){
-					data.filterName = 2
-					data.filterVal = row.cusId
-				}
-				uni.navigateTo({
-					url: '/pages/staff/statis/statisOrderList/statisOrderList?filterInfo='
-						+ encodeURIComponent(JSON.stringify(Object.assign({}, this.formData, data)))
-				})
 			},
 			/* 筛选按钮点击 */
 			filterClick(){
@@ -254,7 +250,7 @@
 			},
 			/* 筛选弹出点击筛选 */
 			search(){
-				this.$refs.ordStock.reload()
+				this.$refs.schSum.reload()
 			},
 		},
 		computed: {
@@ -267,9 +263,6 @@
 				return !this.config.filter.show
 			}
 		},
-		watch: {
-			
-		}
 	}
 </script>
 

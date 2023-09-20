@@ -1,19 +1,25 @@
 <template>
 	<u-popup
+		:zIndex="10075"
+		:overlayIndex="10075"
 		:show="show"
 		@close="closeHandler"
 	>
 		<view class="u-picker">
-			<u-toolbar
-				v-if="showToolbar"
-				:cancelColor="cancelColor"
-				:confirmColor="confirmColor"
-				:cancelText="cancelText"
-				:confirmText="confirmText"
-				:title="title"
-				@cancel="cancel"
-				@confirm="confirm"
-			></u-toolbar>
+			<view v-if="showToolbar">
+				<slot name="toolbar" v-if="showToolbar && !title"></slot>
+				<u-toolbar
+					v-else
+					:cancelColor="cancelColor"
+					:confirmColor="confirmColor"
+					:cancelText="cancelText"
+					:confirmText="confirmText"
+					:title="title"
+					@cancel="cancel"
+					@confirm="confirm"
+				>
+				</u-toolbar>
+			</view>
 			<picker-view
 				class="u-picker__view"
 				:indicatorStyle="`height: ${$u.addUnit(itemHeight)}`"
@@ -82,6 +88,8 @@ export default {
 	mixins: [uni.$u.mpMixin, uni.$u.mixin, props],
 	data() {
 		return {
+			//搜索关键词
+			keyword: null,
 			// 上一次选择的列索引
 			lastIndex: [],
 			// 索引值 ，对应picker-view的value
@@ -134,6 +142,14 @@ export default {
 				value: this.innerColumns.map((item, index) => item[this.innerIndex[index]]),
 				values: this.innerColumns
 			})
+		},
+		// 获取信息
+		getConfirmInfo(){
+			return {
+				indexs: this.innerIndex,
+				value: this.innerColumns.map((item, index) => item[this.innerIndex[index]]),
+				values: this.innerColumns
+			}
 		},
 		// 选择器某一列的数据发生变化时触发
 		changeHandler(e) {

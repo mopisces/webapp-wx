@@ -1,6 +1,6 @@
 <template>
 	<view class="popup-filter-item margin20" @click="config.calendar.show = true">
-		<view class="popup-filter-title">日期区间</view>
+		<view class="popup-filter-title">{{ label }}</view>
 		<view class="popup-filter-content popup-filter-input">
 			<view>
 				<u--input
@@ -36,7 +36,7 @@
 			:defaultDate="rDate"
 			:minDate="min"
 			:maxDate="max"
-			:monthNum="6"
+			:monthNum="mNum"
 			@confirm="dateConfirm"
 			@close="config.calendar.show = false"
 		>
@@ -47,6 +47,10 @@
 <script>
 	export default {
 		props:{
+			label: {
+				type: String,
+				default: '日期区间'
+			},
 			beginDate: {
 				type: String,
 				default: '',
@@ -66,6 +70,10 @@
 			rangeDate: {
 				type: Array,
 				default: []
+			},
+			monthNum: {
+				type: String,
+				default: '12'
 			}
 		},
 		data() {
@@ -79,52 +87,59 @@
 		},
 		methods: {
 			dateConfirm( dateList ) {
-				this.config.calendar.show = false;
-				this.$emit("update:beginDate", dateList[0]);
-				this.$emit("update:endDate", dateList[ dateList.length - 1 ]);
-				this.$emit("update:rangeDate", [dateList[0], dateList[ dateList.length - 1 ]]);
+				this.config.calendar.show = false
+				this.$emit("update:beginDate", dateList[0])
+				this.$emit("update:endDate", dateList[ dateList.length - 1 ])
+				this.$emit("update:rangeDate", [dateList[0], dateList[ dateList.length - 1 ]])
 			}
 		},
 		computed:{
 			sDate: {
 				get(){
-					return this.$props.beginDate;
+					return this.$props.beginDate
 				},
 				set( value ){
-					this.$emit("update:beginDate", value);
+					this.$emit("update:beginDate", value)
 				}
 			},
 			eDate: {
 				get(){
-					return this.$props.endDate;
+					return this.$props.endDate
 				},
 				set( value ){
-					this.$emit("update:endDate", value);
+					this.$emit("update:endDate", value)
 				}
 			},
 			max: {
 				get(){
-					return this.$props.maxDate;
+					return this.$props.maxDate
 				},
 				set( value ){
-					this.$emit("update:maxDate", value);
+					this.$emit("update:maxDate", value)
 				}
 			},
 			min: {
 				get(){
-					return this.$props.minDate;
+					return this.$props.minDate
 				},
 				set( value ){
-					this.$emit("update:minDate", value);
+					this.$emit("update:minDate", value)
 				}
 			},
 			rDate: {
 				get(){
-					console.log(this.$props.rangeDate)
-					return this.$props.rangeDate;
+					return this.$props.rangeDate
 				},
 				set( value ){
-					this.$emit("update:rangeDate", value);
+					this.$emit("update:rangeDate", value)
+				}
+			},
+			mNum: {
+				get(){
+					return this.$props.monthNum
+				},
+				set( value ){
+					this.$emit("update:monthNum", value)
 				}
 			}
 		}

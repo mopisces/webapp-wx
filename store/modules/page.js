@@ -1,14 +1,18 @@
 const state = () => ({
 	pageWidth: null,
 	pageHeight:null,
-	//是否开启ucharts的canvas2d，开启后真机正常显示，微信开发工具显示错误
-	openCanvas2d: false,
+	/* 骨架屏幕配置 */
+	skeleton: {
+		rowNum: 14,
+		rowHeight: 43.2
+	},
 })
 
 const getters = {
 	pageWidth: (state) => state.pageWidth,
 	pageHeight: (state) => state.pageHeight,
-	openCanvas2d: (state) => state.openCanvas2d
+	skeletonRowNum: (state) => state.skeleton.rowNum,
+	skeletonRowHeight: (state) => state.skeleton.rowHeight,
 }
 
 const mutations = {
@@ -17,16 +21,20 @@ const mutations = {
 	},
 	setPageHeight( state, pageHeight ){
 		state.pageHeight = pageHeight;
+	},
+	setSkeletonRowNum( state ) {
+		state.skeleton.rowNum = state.pageHeight / state.skeleton.rowHeight
 	}
 }
 
 const actions = {
-	setPageInfo({ commit }, sysInfo){
+	async setPageInfo({ commit }, sysInfo){
 		const statusBarHeight = sysInfo.statusBarHeight || 0;
 		const menuButtonInfo = uni.getMenuButtonBoundingClientRect();
 		const navBarHeight = menuButtonInfo.height + (menuButtonInfo.top - statusBarHeight) * 2;
-		commit('setPageWidth', sysInfo.screenWidth);
-		commit('setPageHeight', sysInfo.screenHeight - navBarHeight - 25);
+		await commit('setPageWidth', sysInfo.screenWidth);
+		await commit('setPageHeight', sysInfo.screenHeight - navBarHeight - 25);
+		await commit('setSkeletonRowNum')
 	}
 }
 

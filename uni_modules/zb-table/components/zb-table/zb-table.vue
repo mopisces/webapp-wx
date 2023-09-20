@@ -733,7 +733,6 @@ export default {
       }
     },
     scrollAlipay(e){
-
       if(!this.alipayScrollOldTop){
         this.alipayScrollOldTop = e.detail.scrollTop
       }

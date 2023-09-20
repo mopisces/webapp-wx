@@ -25,11 +25,32 @@
 }
 
 .card-body-item-100{
-	width:100%;
+	width: 100%;
 }
 
 .card-body-item-50{
-	width:50%;
+	width: 50%;
+}
+
+.card-actions {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	align-items: center;
+	height: 90rpx;
+	border-top: 2rpx #eee solid;
+}
+
+.card-actions-item {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.card-actions-item-text {
+	font-size: 24rpx;
+	color: #666;
+	margin-left: 10rpx;
 }
 
 .red-color{
@@ -41,6 +62,12 @@
 .green-color{
 	color: $u-success;
 }
+.yellow-color{
+	color: $u-warning;
+}
 .mg-left-20{
 	margin-left: 20rpx;
+}
+.mg-left-40{
+	padding-left: 40rpx;
 }

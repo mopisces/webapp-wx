@@ -49,11 +49,15 @@
 </template>
 
 <script>
+	/* api接口 */
 	import { fetchStatisOrderList } from '@/api/staff/statis.js'
+	
 	export default {
 		data() {
 			return {
+				/* 列表数据 */
 				indexList: [],
+				/* 筛选条件 */
 				formData: {
 					//开始日期
 					beginDate: null,
@@ -77,12 +81,14 @@
 			}
 		},
 		onLoad(options) {
+			/* 获取传递的参数 */
 			this.formData = Object.assign(
 				this.formData, 
 				JSON.parse(decodeURIComponent(options.filterInfo))
 			)
 		},
 		methods: {
+			/* 获取列表数据 */
 			async queryList( pageNo, pageSize ){
 				this.formData.pageNo = pageNo
 				this.formData.pageSize = pageSize

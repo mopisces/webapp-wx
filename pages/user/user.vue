@@ -27,20 +27,20 @@
 		<view class="karry-content-box">
 			
 			<!-- 客户管理 -->
-			<view class="karry-box karry-order-box" v-if="authMap.customerManage">
+			<view class="karry-box karry-tool-box" v-if="authMap.customerManage">
 				<view class="karry-box-header">
 					<view class="box-header-title">客户管理</view>
 					<view class="box-header-sub"></view>
 				</view>
-				<view class="karry-order-list">
-					<view class="karry-order-item" 
+				<view class="karry-order-list karry-flex-wrap">
+					<view class="karry-paper-item" 
 						v-for="(item,idx) in authMap.customerManage" 
 						:key="idx"
-						@click="openPage(item.url)"
+						@click="openPage(item)"
 					>
 						<view class="karry-icon-box">
 							<image
-								class="karry-order-icon" 
+								class="karry-paper-icon" 
 								:src="item.icon"
 							/>
 							<!-- <view class="karry-badge karry-badge-red">3</view> -->
@@ -62,9 +62,10 @@
 					<view 
 						v-for="(item,idx) in authMap.statisManage"  
 						:key="idx" 
-						@click="openPage(item.url)"
+						@click="openPage( item )"
 						class="karry-order-item" 
 					>
+						
 						<view class="karry-icon-box">
 							<image
 								class="karry-order-icon" 
@@ -86,7 +87,11 @@
 					<view class="box-header-sub"></view>
 				</view>
 				<view class="karry-order-list karry-flex-wrap">
-					<view class="karry-paper-item"  v-for="(item,idx) in authMap.paperManage" :key="idx" @click="openPage(item.url)">
+					<view class="karry-paper-item"  
+						v-for="(item,idx) in authMap.paperManage" 
+						:key="idx" 
+						@click="openPage(item)"
+					>
 						<view class="karry-icon-box">
 							<image
 								class="karry-paper-icon" 
@@ -108,7 +113,11 @@
 					<view class="box-header-sub"></view>
 				</view>
 				<view class="karry-order-list karry-flex-wrap">
-					<view class="karry-paper-item"  v-for="(item,idx) in authMap.toolManage" :key="idx">
+					<view class="karry-paper-item"  
+						v-for="(item,idx) in authMap.toolManage" 
+						:key="idx"
+						@click="openPage(item)"
+					>
 						<view class="karry-icon-box">
 							<image
 								class="karry-paper-icon" 
@@ -123,40 +132,91 @@
 			</view>
 			
 			
-			
 		</view>
+		
+		<u-action-sheet 
+			:actions="config.actionSheet.actions" 
+			:title="config.actionSheet.title" 
+			:show=" config.actionSheet.show "
+			:closeOnClickOverlay="true" 
+			:closeOnClickAction="true"
+			@select="actionSheetClick"
+			@close="actionSheetClose"
+		>
+		</u-action-sheet>
 	</view>
 </template>
 
 <script>
-	import { mapGetters } from "vuex";
-	import { getUserInfo } from '@/api/user/index.js';
+	/* vuex辅助函数 */
+	import { mapGetters } from "vuex"
+	/* api接口 */
+	import { getUserInfo } from '@/api/user/index.js'
 	
 	export default {
 		data() {
 			return {
+				/* 页面配置信息 */
 				config:{
-					userInfo:{
-						factoryDesc:'',
-						phoneNum:''
+					/* 底部弹出配置 */
+					actionSheet: {
+						//设置标题
+						title: null,
+						//按钮的文字数组
+						actions: [],
+						//是否显示
+						show: false
 					}
 				},
 			}
 		},
 		computed: {
+			/* store中getter数据 */
 			...mapGetters({ 
 				userInfo: "user/userInfo", 
 				authMap: "user/authMap", 
 			}),
+			/* 底部弹窗是否弹出 */
+			actionSheetShow(){
+				return this.config.actionSheet.show
+			}
+		},
+		watch: {
+			/* 监听底部弹出是否弹出 */
+			actionSheetShow( newV, oldV ){
+				if( !newV ){
+					this.config.actionSheet = this.$options.data().config.actionSheet
+				}
+			}
 		},
 		async mounted(){
-			this.$store.dispatch('user/getUserInfo')
+			await this.$store.dispatch('user/getUserInfo')
 		},
 		methods:{
-			openPage( url ){
-				uni.navigateTo({
-					url: url
-				})
+			/* 页面跳转 */
+			async openPage( item ){
+				if( item.url.constructor === Array ){
+					await item.url.forEach((row, idx)=>{
+						this.config.actionSheet.actions.push({name: row.name, url: row.url })
+					})
+					uni.hideTabBar()
+					this.config.actionSheet.show = true
+				} else {
+					uni.navigateTo({
+						url: item.url
+					})
+				}
+			},
+			/* 底部弹出菜单点击 */
+			actionSheetClick( item ){
+				setTimeout(()=>{
+					this.openPage( item )
+				}, 200)
+			},
+			/* 底部弹出菜单关闭 */
+			actionSheetClose(){
+				this.config.actionSheet.show = false
+				uni.showTabBar()
 			}
 		}
 	}
