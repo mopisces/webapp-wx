@@ -92,7 +92,7 @@
 						/* 模拟数据 */
 						mockList: [],
 						/* 总重量 */
-						total: null
+						total: 0
 					},
 				},
 				/* 筛选条件 */

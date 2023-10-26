@@ -8,7 +8,7 @@
 */
 export function isArray(arg) {
   if (typeof Array.isArray === "undefined") {
-    return Object.prototype.toString.call(arg) === "[object Array]";
+    return Object.prototype.toString.call(arg) === "[object Array]"
   }
   return Array.isArray(arg);
 }
@@ -25,12 +25,15 @@ export function isArray(arg) {
 export function clearAxiosEmptyParam( config ) {
 	['data', 'params'].forEach((item)=>{
 		if (config[item]) {
-			const keys = Object.keys(config[item]);
+			const keys = Object.keys(config[item])
 			if (keys.length) {
 				keys.forEach((row) => {
-					const rawType = toRawType(config[item]);
+					const rawType = toRawType(config[item])
 					if (['', undefined, null].includes(config[item][row]) && ['Object'].includes(rawType) ) {
-						delete config[item][row];
+						delete config[item][row]
+					}
+					if( isArray(config[item][row]) && config[item][row].length == 0 ){
+						delete config[item][row]
 					}
 				});
 			}
@@ -47,7 +50,7 @@ export function clearAxiosEmptyParam( config ) {
 * @return {String} 类型字符串，如'String', 'Object', 'Null', 'Boolean', 'Number', 'Array'
 */
 export function toRawType( value ){
-	return Object.prototype.toString.call(value).slice(8, -1);
+	return Object.prototype.toString.call(value).slice(8, -1)
 }
 
 /**
@@ -60,7 +63,7 @@ export function toRawType( value ){
 */
 export function digitToChi(n)
 {
-	var fraction = ['角', '分'];
+	var fraction = ['角', '分']
 	var digit = [
 		'零', '壹', '贰', '叁', '肆',
 		'伍', '陆', '柒', '捌', '玖'

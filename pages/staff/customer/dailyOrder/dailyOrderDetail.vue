@@ -143,6 +143,7 @@
 				:title="cusInfo.cusName" 
 				:extra="cusInfo.taskName"
 				:is-shadow="true"
+				:border="false"
 			>
 				<view class="card-body-container">
 					<view class="card-body-item card-body-item-100">
@@ -500,6 +501,7 @@ import form from '../../../../uni_modules/uview-ui/libs/config/props/form'
 			},
 			/* 获取日期列表 */
 			async queryDateList(){
+				this.$refs.prvNext.complete([])
 				const { result } = await fetchDailyOrderDetailDateList(this.formData)
 				this.$refs.prvNext.complete(result)
 			},

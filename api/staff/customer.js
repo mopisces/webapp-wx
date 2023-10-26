@@ -89,3 +89,8 @@ export const doRecAdjustModify = (params, config = {}) => http.post(
 	'https://lpkj.leaper.ltd:50006/customer/recAdjust/doModify',
 	params
 )
+//收款调账新增
+export const doRecAdjustInsert = (params, config = {}) => http.post(
+	'https://lpkj.leaper.ltd:50006/customer/recAdjust/doInsert',
+	params
+)

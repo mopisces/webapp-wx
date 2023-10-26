@@ -154,7 +154,7 @@
 						</view>
 						<view 
 							class="card-actions-item"
-							@click="config.modify.show=true;rowClick(item, index)"
+							@click="config.modify.type=2;config.modify.show=true;rowClick(item, index)"
 						>
 							<u-icon name="edit-pen" color="#3c9cff" size="18"></u-icon>
 							<text class="card-actions-item-text">修改</text>
@@ -182,19 +182,18 @@
 			<u--textarea v-model="rowData.delRemark" placeholder="请输入删除原因" >
 			</u--textarea>
 		</u-modal>
-		<!-- 修改弹窗 -->
+		<!-- 修改弹窗|新增弹窗 -->
 		<u-modal
 			:show="config.modify.show"
 			width="690rpx"
-			:asyncClose="true"
 			:showCancelButton="true"
 			@cancel="config.modify.show=false"
-			@confirm="doModify()"
+			@confirm="doConfirm()"
 		>	
 			<view class="modify-modal-container">
 				<view class="modify-modal-scroll">
 					<webapp-cus-picker ref="modifyCusId" :cusId.sync="rowData.cusId"></webapp-cus-picker>
-					<view class="popup-filter-item margin20">
+					<view class="popup-filter-item margin20" @click="dateClick(1)">
 						<view class="popup-filter-title">操作日期</view>
 						<view class="popup-filter-content popup-filter-input">
 							<view>
@@ -232,7 +231,7 @@
 							</view>
 						</view>
 					</view>
-					<view class="popup-filter-item margin20">
+					<view class="popup-filter-item margin20" @click="dateClick(2)">
 						<view class="popup-filter-title">生效日期</view>
 						<view class="popup-filter-content popup-filter-input">
 							<view>
@@ -260,12 +259,9 @@
 								:disableDefaultPadding="true" 
 								inputAlign="center"
 								border="bottom"
-								@blur="setFormatter()"
+								@change="setFormatter()"
 							>
 							</u--input>
-							<view>
-								<u-icon name="arrow-right" color="#2979ff" size="15"></u-icon>
-							</view>
 						</view>
 					</view>
 					<u-alert
@@ -313,6 +309,21 @@
 		</u-picker>
 		<!-- 提示 -->
 		<u-toast ref="uToast"></u-toast>
+		<!-- 表单验证 -->
+		<u-notify ref="uNotify"></u-notify>
+		<!-- 日期选择 -->
+		<u-calendar 
+			:title="config.modify.calendar.type==1?'操作日期':'生效日期'"
+			:showTitle="false"
+			:closeOnClickOverlay="false" 
+			:show="config.modify.calendar.show"
+			:minDate="config.modify.calendar.minDate"
+			:maxDate="config.modify.calendar.maxDate"
+			:defaultDate="config.modify.calendar.defaultDate"
+			:monthNum="13"
+			@confirm="calendarConfirm"
+			@close="config.modify.calendar.show = false"
+		></u-calendar>
 	</view>
 </template>
 
@@ -327,13 +338,16 @@
 	import { mapGetters } from "vuex"
 	/* 自定义方法 */
 	import { digitToChi } from "@/utils/validate.js"
+	/* 表单验证 */
+	import schema from "async-validator"
 	/* api接口 */
 	import { 
 		getRecAdjustConfig, 
 		fetchRecAdjustList, 
 		doRecAdjustCheck,
 		doRecAdjustDel,
-		doRecAdjustModify
+		doRecAdjustModify,
+		doRecAdjustInsert
 	} from "@/api/staff/customer.js"
 	
 	export default {
@@ -392,18 +406,48 @@
 					del: {
 						show: false
 					},
-					/* 修改弹窗 */
+					/* 修改|新增弹窗 */
 					modify: {
 						show: false,
 						/* 修改弹窗日期限制 */
 						calendar: {
+							/* 1->操作日期 2->生效日期 */
+							type: 1,
+							show: false,
 							defaultDate: null,
 							minDate: null,
-							maxDate: null
+							maxDate: null,
+							defNoDate: null
+							
 						},
 						/* 收款金额大写 */
 						alert: {
 							description: null,
+						},
+						/* 1->新增 2->修改 */
+						type: 1, 
+						/* 表单规则 */
+						rules: {
+							cusId: [{
+								require: true, 
+								message: "请选择客户"
+							}],
+							opDate: [{
+								require: true,
+								message: "请选择操作日期"
+							}],
+							shortName: [{
+								require: true,
+								message: "请选择收款方式"
+							}],
+							issueDate: [{
+								require: true,
+								message: "请选择生效日期"
+							}],
+							amount: [{
+								require: true,
+								message: "请输入金额"
+							}]
 						},
 					},
 					/* 收款或者调账方式 */
@@ -466,7 +510,7 @@
 					/* 收款或者调账方式中文 */
 					shortName: null,
 					/* 金额 */
-					amount: null,
+					amount: 0,
 					/* 收据编号 */
 					receiptNo: null,
 					/* 需开票 */
@@ -478,6 +522,9 @@
 		},
 		onReady(){
 			this.getParams()
+		},
+		mounted(){
+			this.validate = new schema(this.config.modify.rules)
 		},
 		methods: {
 			/* 获取参数 */
@@ -495,8 +542,8 @@
 					[this.formData.beginDate, this.formData.endDate]
 				))
 				this.config.filter.checkBox.payType = result.payType.all
-				
-				this.config.modify.calendar.defaultDate = result.date.defaultDate
+				/* 新增|修改弹出层日期 */
+				this.config.modify.calendar.defNoDate = result.date.defaultDate
 				this.config.modify.calendar.minDate = result.date.defaultMinDate
 				this.config.modify.calendar.maxDate = result.date.defaultMaxDate
 				
@@ -505,12 +552,15 @@
 				
 				this.config.picker.column = this.config.picker.columns[this.formData.dataType]
 				
-				if( this.authMap.operateAuth.includes("收款调账维护") ){
+				var operateAuth = this.authMap.operateAuth || ''
+				
+				if( operateAuth.includes("收款调账维护") ){
 					this.config.menu.options.childs.push({
 						id: '2',
 						name: '添加'
 					})
 				}
+				
 				this.$refs.recAdjustList.reload()
 			},
 			/* 分段器变化 */
@@ -535,7 +585,11 @@
 					this.config.filter.show = true
 				}
 				if( e.id == '2' ){
-					this.$refs.recAdjustMenu.closeMenu()
+					this.config.modify.type = 1
+					this.rowData = this.$options.data().rowData
+					this.rowData.dataType = this.formData.dataType
+					this.config.modify.show = true
+					this.setFormatter()
 				}
 			},
 			/* 筛选弹出点击重置 */
@@ -546,6 +600,29 @@
 			/* 筛选弹出点击筛选 */
 			search(){
 				this.$refs.recAdjustList.reload()
+			},
+			/* 弹出层日期点击 */
+			dateClick( type ){
+				this.config.modify.calendar.type = type
+				console.log(type, this.rowData)
+				if( type == 1 && this.rowData.opDate != null ){
+					this.config.modify.calendar.defaultDate = this.rowData.opDate
+				}else if( type == 2 && this.rowData.issueDate != null ){
+					this.config.modify.calendar.defaultDate = this.rowData.issueDate
+				}else{
+					this.config.modify.calendar.defaultDate = this.config.modify.calendar.defNoDate
+				}
+				this.config.modify.calendar.show = true
+			},
+			/* 日历点击确认 */
+			calendarConfirm(e){
+				var dateList = JSON.parse(JSON.stringify(e))
+				if( this.config.modify.calendar.type == 1 ){
+					this.rowData.opDate = dateList[0]
+				}else{
+					this.rowData.issueDate = dateList[0]
+				}
+				this.config.modify.calendar.show = false
 			},
 			/* 列表点击 */
 			rowClick( row, index ){
@@ -560,6 +637,7 @@
 			},
 			/* 审核或者取消审核 */
 			async doCheck(item, index){
+				this.closeMenu()
 				await this.rowClick(item, index)
 				const { result } = await doRecAdjustCheck(this.rowData)
 				await this.$set(
@@ -573,6 +651,7 @@
 			async doDel(){
 				const { result } = await doRecAdjustDel(this.rowData)
 				this.config.del.show = false
+				this.config.indexList.splice(this.rowData.index, 1)
 				this.toastSuccess('删除成功')
 				this.$refs.recAdjustList.reload()
 			},
@@ -582,15 +661,38 @@
 				this.rowData.shortName = e.value[0].value
 				this.config.picker.show = false
 			},
+			/* 新增|修改弹窗确认 */
+			doConfirm(){
+				this.validate.validate(this.rowData).then(()=>{
+					if( this.config.modify.type == 1 ){
+						this.doInsert()
+					}else{
+						this.doModify()
+					}
+				}).catch(({ errors, fields })=>{
+					this.$refs.uNotify.show({
+						type: "error",
+						message: errors[0].message,
+						duration: 1000 * 3
+					})
+				})
+			},
 			/* 修改 */
 			async doModify(){
 				const { result } = await doRecAdjustModify(this.rowData)
 				this.config.modify.show = false
 				await this.fetchRowData()
 				this.toastSuccess('修改成功')
-				//this.$refs.recAdjustList.reload()
 			},
-			/* 修改后更新数据 */
+			/* 新增 */
+			async doInsert(){
+				const { result } = await doRecAdjustInsert(this.rowData)
+				this.rowData.payId = result
+				this.config.modify.show = false
+				await this.fetchRowData()
+				this.toastSuccess('新增成功')
+			},
+			/* 新增|修改后更新数据 */
 			async fetchRowData(){
 				const { result } = await fetchRecAdjustList({
 					cusId: this.rowData.cusId, 
@@ -598,21 +700,16 @@
 					pageSize: 1,
 					pageNo: 1
 				})
-				this.config.indexList.splice(this.rowData.index, 1, result[0])
+				if( this.config.modify.type == 1 ){
+					this.config.indexList.unshift(result[0])
+				} else {
+					this.config.indexList.splice(this.rowData.index, 1, result[0])
+				}
+				
 			},
 			/* 修改弹窗金额中文提示 */
 			setFormatter(){
-				var chi = digitToChi(this.rowData.amount)
-				let _this = this
-				this.$refs.uToast.show({
-					type: 'success',
-					message: chi,
-					position: 'top',
-					duration: 2000,
-					complete: ()=>{
-						_this.config.modify.alert.description = chi
-					}
-				})
+				this.config.modify.alert.description = digitToChi(this.rowData.amount)
 			},
 			/* 设置默认列 */
 			setDefaultType(){
@@ -635,6 +732,10 @@
 						_this.rowData = _this.$options.data().rowData
 					}
 				})
+			},
+			/* 点击审核删除时关闭菜单 */
+			closeMenu(){
+				this.$refs.recAdjustMenu.closeMenu()
 			}
 		},
 		computed: {

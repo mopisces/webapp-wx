@@ -72,6 +72,7 @@
 			:columns="config.picker.columns" 
 			keyName="FFullName"
 			@confirm="confirm" 
+			@cancel="cancel"
 			@change="changeHandler"
 		></u-picker>
 	</view>
@@ -177,6 +178,7 @@
 				const { columnIndex, value, values, index, picker = this.$refs.uPicker } = e;
 				picker.setColumnValues(1, this.config.picker.subCol[value[0].id]);
 			},
+			/* 获取厂商信息 */
 			async setSubFactPicker(){
 				this.config.picker.loading = true;
 				this.config.picker.columns[0] = [];
@@ -201,6 +203,7 @@
 				})
 				this.config.picker.loading = false;
 			},
+			/* 厂商选择确认 */
 			confirm(e){
 				const { indexs, value, values } = e;
 				this.formData.subFact = null;
@@ -211,6 +214,10 @@
 					this.formData.factoryName += '&&' + value[1]
 				}
 				this.config.picker.show = false;
+			},
+			/* 厂商选择取消 */
+			cancel(){
+				this.config.picker.show = false
 			},
 			submit(){
 				this.$refs.uForm.validate().then(res => {

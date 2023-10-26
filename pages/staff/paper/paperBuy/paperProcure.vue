@@ -27,42 +27,30 @@
 		</webapp-popup-filter>
 		<!-- 列表数据 -->
 		<z-paging 
-			ref="procure" 
+			ref="procureList" 
 			v-model="config.mock.mockList" 
 			:auto-show-system-loading="true"
+			:auto="false"
 			@query="queryMock"
 		>
 			<view slot="top">
-				<!-- 头部标签配置 -->
-				<u-subsection
-					:list="config.subsection.list"
-					mode="subsection" 
-					:current="formData.dataType"
-					@change="sectionChange"
-				>
-				</u-subsection>
-				<template v-if="formData.dataType == 1">
-					<!-- 头部选择 -->
-					<webapp-prv-next 
-						:popupShow.sync="config.prevNext.popupShow"
-						:radioData="config.prevNext.radioData" 
-						:key="Math.random()"
-						@radioConfirm="radioConfirm"
-					/>
-				</template>
+				<!-- 头部选择 -->
+				<webapp-prv-next
+					ref="prvNext"
+					:popupShow.sync="config.prevNext.popupShow"
+					:value.sync="formData.poDate"
+					:key="Math.random()"
+					@radioConfirm="radioConfirm"
+				/>
 			</view>
 			<uni-card
-				:title="item.title" 
+				:title="item.poNo" 
+				:extra="item.poDate"
 				:is-shadow="true"
 				v-for="(item, index) in config.mock.mockList" :key="index"
 				@click="detailClick(item)"
 			>
 				<view class="card-body-container">
-					<view v-if="formData.dataType == 0" class="card-body-item card-body-item-100">
-						<text>采购日期:
-							<text class="mg-left-20">{{ item.shortName }}</text>
-						</text>
-					</view>
 					<view class="card-body-item card-body-item-100">
 						<text>供应商:
 							<text class="mg-left-20">{{ item.shortName }}</text>
@@ -75,7 +63,8 @@
 					</view>
 					<view class="card-body-item card-body-item-100">
 						<text>收货/采购: 
-							<text class="mg-left-20">{{ item.inQty }}/{{ item.pOQty }}</text>
+							<text class="mg-left-20">{{ item.inQty }}</text>
+							<text class="mg-left-20">{{ item.poQty }}</text>
 						</text>
 					</view>
 				</view>
@@ -93,6 +82,10 @@
 	import WebappPrvNext from "@/components/webapp-prv-next/webapp-prv-next.vue"
 	/* vuex辅助函数 */
 	import { mapGetters } from "vuex"
+	/* api接口 */
+	import { getWebConfig } from "@/api/staff/common.js"
+	
+	import { fetchPaperProcureDateList, fetchPaperProcureList } from "@/api/staff/paper.js"
 	
 	export default {
 		components:{
@@ -113,11 +106,6 @@
 					/* 筛选弹窗配置 */
 					filter: {
 						show: false,
-						
-					},
-					/* 头部标签配置 */
-					subsection: {
-						list: ['全部', '按日期']
 					},
 					/* 模拟上拉加载数据 */
 					mock: {
@@ -129,52 +117,107 @@
 				},
 				/* 筛选条件 */
 				formData: {
-					//类型0->全部 1->按日期
-					dataType: 0,
+					//采购日期
+					poDate: null,
 					//开始日期
-					beginDate: '2023-06-01',
+					beginDate: null,
 					//结束日期
-					endDate: '2023-06-05',
+					endDate: null,
 					//最大日期
-					maxDate: '2023-10-01',
+					maxDate: null,
 					//最小日期
-					minDate: '2023-04-01',
+					minDate: null,
 					//日期区间
-					rangeDate: ['2023-06-01', '2023-06-05']
+					rangeDate: [],
+					//分页信息
+					pageNo: 1,
+					//当前页数量
+					pageSize: 10,
 				}
 			}
 		},
+		onReady(){
+			this.getParams()
+		},
 		methods: {
+			/* 获取参数 */
+			async getParams(){
+				const { result } = await getWebConfig( { paramType: 'paperBuyProcure' } )
+				this.formData.beginDate = result.beginDate
+				this.formData.endDate = result.endDate
+				this.formData.minDate = result.minDate
+				this.formData.maxDate = result.maxDate
+				this.formData.rangeDate = JSON.parse(
+					JSON.stringify([this.formData.beginDate, this.formData.endDate])
+				)
+				await this.queryDateList()
+			},
+			/* 获取日期列表 */
+			async queryDateList(){
+				this.$refs.prvNext.complete([])
+				const { result } = await fetchPaperProcureDateList( this.formData )
+				this.$refs.prvNext.complete(result)
+			},
+			/* 获取列表数据 */
+			async queryList(){
+				this.config.mock = this.$options.data().config.mock
+				const { result } = await fetchPaperProcureList( this.formData )
+				this.config.mock.indexList = result
+			},
+			/* 模拟上拉加载下拉刷新数据 */
+			async queryMock( pageNo, pageSize ){
+				if( pageNo == 1 ){
+					await this.queryList()
+				}
+				
+				var subList = []
+				
+				if( this.config.mock.indexList.length > 0 ){
+					subList = this.config.mock.indexList.splice( 0, pageSize )
+				}
+				
+				setTimeout(()=>{
+					this.$refs.procureList.complete(subList)
+				}, 1500)
+			},
 			/* 筛选按钮点击 */
 			filterClick(){
 				this.config.filter.show = true
 			},
 			/* 头部选择选中后触发 */
 			radioConfirm( val ){
-				this.$refs.procure.reload()
+				this.formData.poDate = val
+				if( val ){
+					this.$refs.procureList.reload()
+				}else{
+					this.$refs.procureList.complete([])
+				}
 			},
 			/* 列表详细信息 */
 			detailClick( row ){
 				const data = {
-						//数据类型 0->原纸收货 1->原纸采购
-						dataType: 1,
-						//供应商 
-						shortName: row.shortName,
-						//显示日期
-						date: row.date,
-						//对应的收货单号或者采购单号
-						keyWord: row.title
-					}
-					uni.navigateTo({
-						url: '/pages/staff/paper/paperBuy/detail?filterInfo='
-							+ encodeURIComponent(JSON.stringify(data))
-					})
+					//数据类型 0->原纸收货 1->原纸采购
+					dataType: 1,
+					//供应商 
+					shortName: row.shortName,
+					//显示日期
+					date: row.poDate,
+					//对应的收货单号或者采购单号
+					keyWord: row.poNo
 				}
+				uni.navigateTo({
+					url: '/pages/staff/paper/paperBuy/detail?filterInfo='
+						+ encodeURIComponent(JSON.stringify(data))
+				})
 			},
 			/* 筛选重置 */
-			reset(){},
+			async reset(){
+				await this.getParams()
+			},
 			/* 筛选点击 */
-			search(){}
+			async search(){
+				await this.queryDateList()
+			}
 		},
 		computed: {
 			/* store中getter数据 */

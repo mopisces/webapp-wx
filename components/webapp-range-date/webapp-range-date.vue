@@ -128,7 +128,7 @@
 			},
 			rDate: {
 				get(){
-					return this.$props.rangeDate
+					return JSON.parse(JSON.stringify(this.$props.rangeDate)) 
 				},
 				set( value ){
 					this.$emit("update:rangeDate", value)

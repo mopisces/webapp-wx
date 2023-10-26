@@ -75,11 +75,11 @@
 			</u-form-item>
 			<u-form-item
 				label="重量(kg)"
-				prop="curWt"
+				prop="oriWt"
 				borderBottom
 			>
 				<u--input
-					v-model="info.curWt"
+					v-model="info.oriWt"
 					disabled
 					disabledColor="#e5e5e5"
 					border="none"
@@ -126,7 +126,7 @@
 			text="提交"
 			customStyle="margin-top: 100rpx"
 			:disabled="config.submit.disabled"
-			@click="subClick"
+			@click="submit"
 		></u-button>
 		<!-- 日期选择 -->
 		<u-calendar
@@ -158,7 +158,7 @@
 	/* api接口 */
 	import { getWebConfig } from "@/api/staff/common.js"
 	
-	import { getStockInInfo } from "@/api/staff/paper.js"
+	import { getStockInInfo, doStockIn } from "@/api/staff/paper.js"
 	
 	export default {
 		data() {
@@ -185,7 +185,7 @@
 								},
 								{
 									validator: (rule, value, callback)=> {
-										return value > Number(this.info.curWt) ? false : true
+										return value > Number(this.info.oriWt) ? false : true
 									},
 									message: '回仓重量超过重量',
 									trigger: 'blur'
@@ -221,7 +221,7 @@
 					//原纸克重
 					paperWt: null,
 					//重量
-					curWt: 0,
+					oriWt: 0,
 				},
 				/* 表单数据 */
 				formData: {
@@ -269,7 +269,7 @@
 				this.config.calendar.show = false
 			},
 			/* 原纸入库按钮点击 */
-			subClick(){
+			submit(){
 				this.$refs.stockIn.validate().then(res => {
 					this.config.modal.show = true
 				}).catch(errors => {
@@ -277,20 +277,27 @@
 				})
 			},
 			/* 原纸入库 */
-			stockIn(){
-				
+			async stockIn(){
+				const { result } = await doStockIn(this.formData)
+				this.formData = this.$options.data().formData
+				this.info = this.$options.data().info
+				this.config.form.submit.disabled = this.$options.data().config.form.submit.disabled
+				this.config.form.modal.show = false
+				this.$refs.stockInToast.show({
+					type: 'success',
+					message: "入库成功",
+				})
+				this.getParams()
 			},
 			/* 获取信息 */
 			async getInfo(){
-				
 				this.info = this.$options.data().info
 				this.config.submit.disabled = this.$options.data().config.submit.disabled
 				const { result } = await getStockInInfo( this.formData )
-				/* this.info.paperWidth = result.paperWidth
+				this.info.paperWidth = result.paperWidth
 				this.info.paperCode = result.paperCode
 				this.info.paperWt = result.paperWt
-				this.info.curWt = result.curWt */
-				//b23041128600
+				this.info.oriWt = result.oriWt
 				this.config.submit.disabled = false
 			},
 		},
@@ -301,14 +308,11 @@
 		},
 		watch: {
 			stockNo( newV, oldV ){
-				if(newV){
-					if( newV.length == 12 ){
-						console.log(newV)
-						this.getInfo()
-					}else{
-						this.info = this.$options.data().info
-						this.config.submit.disabled = true
-					}
+				if(newV && newV.length == 12){
+					this.getInfo()
+				} else {
+					this.info = this.$options.data().info
+					this.config.submit.disabled = true
 				}
 			}
 		}

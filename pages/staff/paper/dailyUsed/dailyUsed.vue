@@ -214,6 +214,7 @@
 			},
 			/* 获取日期列表 */
 			async queryDateList(){
+				this.$refs.prvNext.complete([])
 				const { result } = await fetchDailyUsedDateList( this.formData )
 				this.$refs.prvNext.complete(result)
 			},

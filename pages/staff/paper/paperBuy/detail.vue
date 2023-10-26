@@ -113,7 +113,6 @@
 			},
 			/* 获取表格数据 */
 			async queryList(){
-				
 				const { result } = await fetchPaperBuyList( this.formData )
 				this.config.table.data = result
 			}

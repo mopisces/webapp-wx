@@ -248,6 +248,7 @@
 					this.config.popup.show = true
 				}
 			},
+			/* 模拟上拉加载下拉刷新 */
 			async queryMock( pageNo, pageSize ){
 				this.formData.type == 1
 				if( pageNo == 1 ){

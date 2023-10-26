@@ -12,8 +12,9 @@
 		</view>
 		<!-- 头部选择 -->
 		<webapp-prv-next 
+			ref="prvNext"
 			:popupShow.sync="config.prevNext.popupShow"
-			:radioData="config.prevNext.radioData" 
+			:value.sync="formData.searchData"
 			:key="Math.random()"
 			@radioConfirm="radioConfirm"
 		>
@@ -149,12 +150,13 @@
 			},
 			/* 按分段器绑定值修改表格和头部选择配置 */
 			setPageType( dataType ){
+				this.$refs.prvNext.complete([])
 				if( dataType == 1 ){
 					this.config.table.column = this.config.prevNext.columns.width
-					this.config.prevNext.radioData = this.radioData.widthData
+					this.$refs.prvNext.complete(this.radioData.widthData)
 				}else{
 					this.config.table.column = this.config.prevNext.columns.code
-					this.config.prevNext.radioData = this.radioData.codeData
+					this.$refs.prvNext.complete(this.radioData.codeData)
 				}
 			},
 			/* 头部选择选中后触发 */

@@ -25,186 +25,278 @@
 				"backgroundColorTop": "#5677FC"
 			}
 		},
-		//内部用户
-		//客户模块
+		//内外部公共页面
 		{
-			"path": "pages/staff/customer/dailyOrder/dailyOrder",
+			"path": "pages/common/orderDetail/index",
 			"style": {
-				"navigationBarTitleText": "客户每日订单",
+				"navigationBarTitleText": "订单详细信息",
 				"backgroundColorTop": "#5677FC"
 			}
+		}
+	],
+	"subPackages":[
+		//内部用户--客户管理
+		{
+			"root": "pages/staff/customer",
+			"pages": [
+				{
+					"path": "dailyOrder/dailyOrder",
+					"style": {
+						"navigationBarTitleText": "客户每日订单",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "dailyOrder/dailyOrderDetail",
+					"style": {
+						"navigationBarTitleText": "客户每日订单详情",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "dailyDelivery/daliyDelivery",
+					"style": {
+						"navigationBarTitleText": "客户每日送货",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "dailyDelivery/dailyDeliveryDetail",
+					"style": {
+						"navigationBarTitleText": "客户每日送货详情",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "frec/cusContact",
+					"style": {
+						"navigationBarTitleText": "客户往来统计",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "credit/creditBal",
+					"style": {
+						"navigationBarTitleText": "客户信用余额",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "frec/recAdjust",
+					"style": {
+						"navigationBarTitleText": "收款调账",
+						"backgroundColorTop": "#5677FC"
+					}
+				}
+			]
 		},
+		//内部用户--统计管理
 		{
-			"path": "pages/staff/customer/dailyOrder/dailyOrderDetail",
-			"style": {
-				"navigationBarTitleText": "客户每日订单详情",
-				"backgroundColorTop": "#5677FC"
-			}
+			"root": "pages/staff/statis",
+			"pages": [
+				{
+					"path": "getOrdReturnSum/getOrdReturnSum",
+					"style": {
+						"navigationBarTitleText": "退货统计",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "getOrdStock/getOrdStock",
+					"style": {
+						"navigationBarTitleText": "库存统计",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "getOrdSum/getOrdSum1",
+					"style": {
+						"navigationBarTitleText": "订单统计1",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "getOrdSum/getOrdSum2",
+					"style": {
+						"navigationBarTitleText": "订单统计2",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "statisOrderList/statisOrderList",
+					"style": {
+						"navigationBarTitleText": "订单详情",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "getSchSum/getSchSum",
+					"style": {
+						"navigationBarTitleText": "传单统计",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "saleStatis/saleStatis",
+					"style": {
+						"navigationBarTitleText": "接单统计",
+						"backgroundColorTop": "#5677FC"
+					}
+				}
+			]
 		},
+		//内部用户--原纸管理
 		{
-			"path": "pages/staff/customer/dailyDelivery/daliyDelivery",
-			"style": {
-				"navigationBarTitleText": "客户每日送货",
-				"backgroundColorTop": "#5677FC"
-			}
+			"root": "pages/staff/paper",
+			"pages": [
+				{
+					"path": "paperSafe/paperSafe",
+					"style": {
+						"navigationBarTitleText": "安全库存",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "paperBuy/paperProcure",
+					"style": {
+						"navigationBarTitleText": "原纸采购",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "getSStocks/getSStocks",
+					"style": {
+						"navigationBarTitleText": "原纸库存",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "stock/stockOut",
+					"style": {
+						"navigationBarTitleText": "原纸出库",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "dailyUsed/dailyUsed",
+					"style": {
+						"navigationBarTitleText": "原纸日用量",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "dailyUsed/detail",
+					"style": {
+						"navigationBarTitleText": "原纸日用量详情",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "stock/stockIn",
+					"style": {
+						"navigationBarTitleText": "原纸入库",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "paperBuy/takeDelivery",
+					"style": {
+						"navigationBarTitleText": "原纸收货",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				//原纸收货、采购详细信息
+				{
+					"path": "paperBuy/detail",
+					"style": {
+						"navigationBarTitleText": "详细信息",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "stock/stockDirectIn",
+					"style": {
+						"navigationBarTitleText": "直接入库",
+						"backgroundColorTop": "#5677FC"
+					}
+				}
+			]
 		},
+		//内部用户--我的工具
 		{
-			"path": "pages/staff/customer/dailyDelivery/dailyDeliveryDetail",
-			"style": {
-				"navigationBarTitleText": "客户每日送货详情",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		{
-			"path": "pages/staff/customer/frec/cusContact",
-			"style": {
-				"navigationBarTitleText": "客户往来统计",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		{
-			"path": "pages/staff/customer/credit/creditBal",
-			"style": {
-				"navigationBarTitleText": "客户信用余额",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		{
-			"path": "pages/staff/customer/frec/recAdjust",
-			"style": {
-				"navigationBarTitleText": "收款调账",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		//统计模块
-		{
-			"path": "pages/staff/statis/getOrdReturnSum/getOrdReturnSum",
-			"style": {
-				"navigationBarTitleText": "退货统计",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		{
-			"path": "pages/staff/statis/getOrdStock/getOrdStock",
-			"style": {
-				"navigationBarTitleText": "库存统计",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		{
-			"path": "pages/staff/statis/getOrdSum/getOrdSum1",
-			"style": {
-				"navigationBarTitleText": "订单统计1",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		{
-			"path": "pages/staff/statis/getOrdSum/getOrdSum2",
-			"style": {
-				"navigationBarTitleText": "订单统计2",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		{
-			"path": "pages/staff/statis/statisOrderList/statisOrderList",
-			"style": {
-				"navigationBarTitleText": "订单详情",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		{
-			"path": "pages/staff/statis/getSchSum/getSchSum",
-			"style": {
-				"navigationBarTitleText": "传单统计",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		{
-			"path": "pages/staff/statis/saleStatis/saleStatis",
-			"style": {
-				"navigationBarTitleText": "接单统计",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		//原纸管理模块
-		{
-			"path": "pages/staff/paper/paperSafe/paperSafe",
-			"style": {
-				"navigationBarTitleText": "安全库存",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		{
-			"path": "pages/staff/paper/getSStocks/getSStocks",
-			"style": {
-				"navigationBarTitleText": "原纸库存",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		{
-			"path": "pages/staff/paper/stock/stockOut",
-			"style": {
-				"navigationBarTitleText": "原纸出库",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		{
-			"path": "pages/staff/paper/dailyUsed/dailyUsed",
-			"style": {
-				"navigationBarTitleText": "原纸日用量",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		{
-			"path": "pages/staff/paper/dailyUsed/detail",
-			"style": {
-				"navigationBarTitleText": "原纸日用量详情",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		{
-			"path": "pages/staff/paper/stock/stockIn",
-			"style": {
-				"navigationBarTitleText": "原纸入库",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		{
-			"path": "pages/staff/paper/paperBuy/takeDelivery",
-			"style": {
-				"navigationBarTitleText": "原纸收货",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		/* 原纸收货、采购详细信息 */
-		{
-			"path": "pages/staff/paper/paperBuy/detail",
-			"style": {
-				"navigationBarTitleText": "详细信息",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		//我的工具模块
-		{
-			"path": "pages/staff/tool/customer/customerInfo",
-			"style": {
-				"navigationBarTitleText": "客户查询",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		{
-			"path": "pages/staff/tool/stock/deliveryArea",
-			"style": {
-				"navigationBarTitleText": "库区面积",
-				"backgroundColorTop": "#5677FC"
-			}
-		},
-		{
-			"path": "pages/staff/tool/getProInfo/getProInfo",
-			"style": {
-				"navigationBarTitleText": "生产分析总计",
-				"backgroundColorTop": "#5677FC"
-			}
+			"root": "pages/staff/tool",
+			"pages": [
+				{
+					"path": "quo/quoList",
+					"style": {
+						"navigationBarTitleText": "报价查询",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "calc/calcOrd",
+					"style": {
+						"navigationBarTitleText": "订单试算",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "quo/quoDetail",
+					"style": {
+						"navigationBarTitleText": "报价查询详情",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "customer/customerInfo",
+					"style": {
+						"navigationBarTitleText": "客户查询",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "stock/mStockDetail",
+					"style": {
+						"navigationBarTitleText": "库存修改",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "stow/stowList",
+					"style": {
+						"navigationBarTitleText": "扫描装货",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "stow/detailList",
+					"style": {
+						"navigationBarTitleText": "扫描装货明细",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "stock/deliveryArea",
+					"style": {
+						"navigationBarTitleText": "库区面积",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "getProInfo/getProInfo",
+					"style": {
+						"navigationBarTitleText": "生产分析总计",
+						"backgroundColorTop": "#5677FC"
+					}
+				},
+				{
+					"path": "customer/manage",
+					"style": {
+						"navigationBarTitleText": "用户管理",
+						"backgroundColorTop": "#5677FC"
+					}
+				}
+			]
 		}
 	],
 	"globalStyle": {

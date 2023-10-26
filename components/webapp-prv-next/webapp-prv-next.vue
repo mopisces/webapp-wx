@@ -123,6 +123,10 @@
 											<view>残卷卷数:{{ item.cJCount }}</view>
 											<view>重量:{{ item.sRWt }}</view>
 										</view>
+										<!-- 原纸采购 -->
+										<view v-else-if=" item.tag == 'paperProcure' ">
+											<view>日期信息:{{ item.prevNext }}</view>
+										</view>
 										<radio
 											:value="item.prevNext" 
 											:checked=" val == item.prevNext " 

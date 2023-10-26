@@ -4,9 +4,10 @@
 	<view class="content">
 		<!-- 订单列表 -->
 		<z-paging 
-			ref="paging" 
+			ref="erpOrder" 
 			v-model="indexList" 
 			:auto-show-system-loading="true"
+			:auto="false"
 			@query="queryList"
 		>
 			<view slot="top">
@@ -158,7 +159,9 @@
 	/* 自定义纸箱尺寸组件 */
 	import WebappFilterBoxSize from "@/components/webapp-filter-box-size/webapp-filter-box-size.vue"
 	/* api接口 */
-	import { getErpOrders, getErpConfig } from "@/api/staff/erpOrders.js"
+	import { getWebConfig } from "@/api/staff/common.js"
+	
+	import { fetchList } from "@/api/staff/erpOrders.js"
 	
 	export default {
 		components:{
@@ -253,8 +256,6 @@
 					pageNo: 1,
 					//当前页数量
 					pageSize: 10,
-					//页面是否需要重新请求参数
-					pageInit: true,
 				},
 				//数据列表
 				indexList: []
@@ -263,48 +264,56 @@
 		onLoad() {
 			
 		},
-		created() {
-		
-		},
 		mounted() {
-			
+			this.getParams()
 		},
 		methods: {
+			/* 获取参数 */
+			async getParams(){
+				const { result } = await getWebConfig( { paramType: 'erpOrder' } )
+				this.formData.beginDate = result.beginDate
+				this.formData.endDate = result.endDate
+				this.formData.minDate = result.minDate
+				this.formData.maxDate = result.maxDate
+				//测试
+				/* this.formData.beginDate = '2023-04-01'
+				this.formData.endDate = '2023-06-30' */
+				
+				this.formData.rangeDate = JSON.parse(
+					JSON.stringify([this.formData.beginDate, this.formData.endDate])
+				)
+				this.$refs.erpOrder.reload()
+			},
 			/* 获取订单列表 */
 			async queryList( pageNo, pageSize ){
-				if( this.formData.pageInit ){
-					const { result } = await getErpConfig();
-					this.formData.minDate = result.Wap1GetOrdersMinDate
-					this.formData.maxDate = result.Wap1GetOrdersMaxDate
-					this.formData.beginDate = result.Wap1GetOrdersBeginDate
-					this.formData.endDate = result.Wap1GetOrdersEndDate
-					this.formData.rangeDate = [ this.formData.beginDate, this.formData.endDate ]
-					this.formData.pageInit = false;
-				}
 				this.formData.pageNo = pageNo
 				this.formData.pageSize = pageSize
-				const { result } = await getErpOrders(this.formData)
-				this.$refs.paging.complete(result)
+				const { result } = await fetchList(this.formData)
+				this.$refs.erpOrder.complete(result)
 			},
 			/* 头部切换选中标签 */
 			tabsChange( evt ){
 				this.formData.erpState = evt.index
-				this.$refs.paging.reload()
+				this.$refs.erpOrder.reload()
 			},
 			/* 列表点击 */
-			itemClick(index){
+			itemClick(rowData){
 				//this.config.filter.show = true
+				uni.navigateTo({
+					url: '/pages/common/orderDetail/index?filterInfo='
+						+ encodeURIComponent(JSON.stringify(rowData))
+				})
 			},
 			/* 筛选重置 */
-			filterReset(){
+			async filterReset(){
 				this.formData = this.$options.data().formData
 				this.$refs.cusId.onClear()
-				this.$refs.paging.reload()
+				await this.getParams()
 			},
 			/* 筛选搜索 */
 			filterSearch(){
-				this.$refs.paging.reload()
-			}
+				this.$refs.erpOrder.reload()
+			},
 		}
 	}
 </script>

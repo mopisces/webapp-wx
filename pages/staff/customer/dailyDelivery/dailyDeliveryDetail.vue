@@ -8,9 +8,8 @@
 			id="deliveryDailyDetail"
 			ref="prvNext"
 			:popupShow.sync="config.prevNext.popupShow"
-			:radioData="config.prevNext.radioData"
-			:key="Math.random()"
 			:value.sync="formData.dnDate"
+			:key="Math.random()"
 			@radioConfirm="radioConfirm"
 		>
 		</webapp-prv-next>
@@ -294,7 +293,7 @@
 		},
 		onLoad(options) {
 			this.filter = JSON.parse(decodeURIComponent(options.filterInfo))
-			 Object.assign( 
+			Object.assign( 
 				this.formData, 
 				this.filter
 			)
@@ -338,6 +337,7 @@
 			},
 			/* 获取日期列表 */
 			async queryDateList(){
+				this.$refs.prvNext.complete([])
 				const { result } = await fetchDeliveryDailyDetailDateList( this.formData )
 				this.$refs.prvNext.complete(result)
 			},
