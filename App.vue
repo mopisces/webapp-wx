@@ -37,7 +37,7 @@
 				//#endif
 			},
 			checkLogin(){
-				if( !this.$store.getters['user/accessToken'] ){
+				if( !this.$store.getters ){
 					console.log('需要登录')
 				}
 				

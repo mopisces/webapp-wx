@@ -22,7 +22,6 @@
 				:is-shadow="true"
 				v-for="(item, index) in config.mock.mockList" 
 				:key="index"
-				@click="detailClick(item)"
 			>
 				<view class="card-body-container">
 					<view class="card-body-item card-body-item-100">

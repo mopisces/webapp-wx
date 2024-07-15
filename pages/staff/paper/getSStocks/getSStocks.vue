@@ -12,7 +12,17 @@
 		</view>
 		<!-- 头部选择 -->
 		<webapp-prv-next 
-			ref="prvNext"
+			v-if="formData.dataType==1"
+			ref="width"
+			:popupShow.sync="config.prevNext.popupShow"
+			:value.sync="formData.searchData"
+			:key="Math.random()"
+			@radioConfirm="radioConfirm"
+		>
+		</webapp-prv-next>
+		<webapp-prv-next
+			v-else
+			ref="code"
 			:popupShow.sync="config.prevNext.popupShow"
 			:value.sync="formData.searchData"
 			:key="Math.random()"
@@ -108,11 +118,9 @@
 				},
 			}
 		},
-		mounted(){
-			this.setTable()
-			this.$nextTick(()=>{
-				this.getConfig()
-			})
+		async mounted(){
+			await this.setTable()
+			await this.getConfig()
 		},
 		methods:{
 			/* 设置表格 */
@@ -123,11 +131,13 @@
 				}).exec()
 			},
 			/* 分段器修改 */
-			sectionChange(idx){
+			async sectionChange(idx){
 				this.formData.dataType = idx
-				this.setPageType( idx )
 				this.config.table.data = []
-				this.getData()
+				setTimeout(()=>{
+					this.setPageType( this.formData.dataType )
+				}, 200)
+				await this.getData()
 			}, 
 			/* 获取页面数据 */
 			async getConfig(){
@@ -136,27 +146,21 @@
 				this.radioData.widthData = result.width_select
 				this.radioData.codeData = result.code_select
 				this.setPageType( this.formData.dataType )
-				this.$nextTick(() => {
-					if( this.formData.searchData ){
-						this.getData()
-					}
-				})
+				
 			},
 			/* 获取表格数据 */
 			async getData(){
-				this.setPageType( this.formData.dataType )
 				const { result } = await getSStock(this.formData)
 				this.config.table.data = result
 			},
 			/* 按分段器绑定值修改表格和头部选择配置 */
 			setPageType( dataType ){
-				this.$refs.prvNext.complete([])
 				if( dataType == 1 ){
 					this.config.table.column = this.config.prevNext.columns.width
-					this.$refs.prvNext.complete(this.radioData.widthData)
+					this.$refs.width.complete(this.radioData.widthData)
 				}else{
 					this.config.table.column = this.config.prevNext.columns.code
-					this.$refs.prvNext.complete(this.radioData.codeData)
+					this.$refs.code.complete(this.radioData.codeData)
 				}
 			},
 			/* 头部选择选中后触发 */

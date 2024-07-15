@@ -167,7 +167,7 @@
 			},
 			/* 取消搜索 */
 			onClear(){
-				this.formData.keyWord = ''
+				this.formData.keyWord = ""
 				this.fetchList()
 			},
 		},
